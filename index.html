@@ -940,13 +940,8 @@
                 owedList.innerHTML = html;
 
                 document.querySelectorAll('#owedList .debt-item').forEach(el => {
-                    el.addEventListener('click', function() {
-                        const id = this.dataset.id;
-                        if (id && confirm('Видалити цей борг?')) {
-                            state.debts.owed = state.debts.owed.filter(d => d.id !== id);
-                            saveToFirebase();
-                        }
-                    });
+                    el.removeEventListener('click', handleOwedClick);
+                    el.addEventListener('click', handleOwedClick);
                 });
             }
 
@@ -970,14 +965,26 @@
                 oweList.innerHTML = html;
 
                 document.querySelectorAll('#oweList .debt-item').forEach(el => {
-                    el.addEventListener('click', function() {
-                        const id = this.dataset.id;
-                        if (id && confirm('Видалити цей борг?')) {
-                            state.debts.owe = state.debts.owe.filter(d => d.id !== id);
-                            saveToFirebase();
-                        }
-                    });
+                    el.removeEventListener('click', handleOweClick);
+                    el.addEventListener('click', handleOweClick);
                 });
+            }
+        }
+
+        // Обробники кліків для видалення боргів
+        function handleOwedClick() {
+            const id = this.dataset.id;
+            if (id && confirm('Видалити цей борг?')) {
+                state.debts.owed = state.debts.owed.filter(d => d.id !== id);
+                saveToFirebase();
+            }
+        }
+
+        function handleOweClick() {
+            const id = this.dataset.id;
+            if (id && confirm('Видалити цей борг?')) {
+                state.debts.owe = state.debts.owe.filter(d => d.id !== id);
+                saveToFirebase();
             }
         }
 
@@ -987,10 +994,6 @@
             database.ref('users/' + currentUser.uid).set({
                 goals: state.goals,
                 debts: state.debts
-            }).then(() => {
-                renderGoals();
-                renderDebts();
-                updateStats();
             });
         }
 
