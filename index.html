@@ -3,27 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BORGY · менеджер боргів</title>
+    <title>BORGY · Firebase синхронізація</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         :root {
-            --bg: #0a0c0f;
-            --surface: #15181c;
-            --surface-light: #1e2228;
-            --primary: #6c5ce7;
-            --primary-dark: #5649c0;
-            --success: #00b894;
-            --danger: #d63031;
+            --bg: #0a0c10;
+            --surface: #14181c;
+            --surface-light: #1e2329;
+            --primary: #6d5dfc;
+            --primary-dark: #5a4ad1;
+            --success: #2ecc71;
+            --danger: #e74c3c;
             --warning: #f39c12;
-            --text: #e9ecef;
-            --text-secondary: #8b949e;
-            --border: #2d333a;
+            --text: #ecf0f1;
+            --text-secondary: #95a5a6;
+            --border: #2c3e50;
         }
 
         body {
@@ -53,73 +57,58 @@
         .logo h1 {
             font-size: 2.5rem;
             font-weight: 700;
-            background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+            background: linear-gradient(135deg, var(--primary), #a29bfe);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
         }
 
-        .logo span {
-            color: var(--text-secondary);
-            font-size: 1rem;
-            margin-left: 10px;
+        .auth-section {
+            display: flex;
+            gap: 15px;
+            align-items: center;
         }
 
-        .user-info {
+        .user-email {
             background: var(--surface);
             padding: 12px 24px;
-            border-radius: 60px;
+            border-radius: 40px;
             border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        #userId {
             color: var(--primary);
-            font-weight: 600;
+            font-weight: 500;
         }
 
-        /* PDF кнопки */
-        .pdf-section {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-
-        .btn-pdf {
+        .btn {
             background: var(--surface);
             border: 1px solid var(--border);
             color: var(--text);
-            padding: 14px 28px;
-            border-radius: 60px;
+            padding: 12px 28px;
+            border-radius: 40px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border: none;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-google {
+            background: white;
+            color: #2c3e50;
             display: flex;
             align-items: center;
             gap: 10px;
-            transition: 0.2s;
-            flex: 1;
-            justify-content: center;
         }
 
-        .btn-pdf.save {
-            background: #1e2a2a;
-            border-color: #004d40;
-            color: #00b894;
-        }
-
-        .btn-pdf.load {
-            background: #1e1f2a;
-            border-color: #4834d4;
-            color: #a29bfe;
-        }
-
-        .btn-pdf:hover {
-            transform: translateY(-2px);
-            filter: brightness(1.2);
+        .btn-google:hover {
+            background: #f0f0f0;
         }
 
         /* Статистика */
@@ -133,13 +122,8 @@
         .stat-card {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 28px;
+            border-radius: 24px;
             padding: 24px;
-            transition: 0.2s;
-        }
-
-        .stat-card:hover {
-            border-color: var(--primary);
         }
 
         .stat-title {
@@ -150,30 +134,22 @@
             margin-bottom: 15px;
         }
 
+        .stat-total {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin: 15px 0;
+            color: var(--primary);
+        }
+
         .stat-item {
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
+            padding: 8px 0;
             border-bottom: 1px solid var(--border);
         }
 
         .stat-item:last-child {
             border-bottom: none;
-        }
-
-        .stat-label {
-            color: var(--text-secondary);
-        }
-
-        .stat-value {
-            font-weight: 600;
-        }
-
-        .stat-total {
-            font-size: 2rem;
-            font-weight: 700;
-            margin: 10px 0;
-            color: var(--primary);
         }
 
         /* Цілі */
@@ -186,6 +162,8 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .section-header h2 {
@@ -197,20 +175,13 @@
             background: var(--primary);
             color: white;
             border: none;
-            padding: 12px 28px;
-            border-radius: 60px;
-            font-size: 1rem;
+            padding: 14px 28px;
+            border-radius: 40px;
             font-weight: 600;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 10px;
-            transition: 0.2s;
-        }
-
-        .btn-create:hover {
-            background: var(--primary-dark);
-            transform: scale(0.98);
         }
 
         .goals-grid {
@@ -223,7 +194,7 @@
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 24px;
-            padding: 20px;
+            padding: 24px;
             position: relative;
         }
 
@@ -231,7 +202,7 @@
             position: absolute;
             top: 15px;
             right: 15px;
-            background: rgba(214, 48, 49, 0.1);
+            background: rgba(231, 76, 60, 0.1);
             color: var(--danger);
             width: 32px;
             height: 32px;
@@ -241,7 +212,6 @@
             justify-content: center;
             cursor: pointer;
             border: 1px solid var(--danger);
-            transition: 0.2s;
         }
 
         .goal-delete:hover {
@@ -269,16 +239,12 @@
             margin: 10px 0;
         }
 
-        .goal-progress {
-            margin: 15px 0;
-        }
-
         .progress-stats {
             display: flex;
             justify-content: space-between;
             color: var(--text-secondary);
             font-size: 0.9rem;
-            margin-bottom: 5px;
+            margin: 15px 0 5px;
         }
 
         .progress-bar {
@@ -286,11 +252,12 @@
             height: 10px;
             border-radius: 10px;
             overflow: hidden;
+            margin-bottom: 20px;
         }
 
         .progress-fill {
             height: 100%;
-            background: linear-gradient(90deg, var(--success), #00cec9);
+            background: linear-gradient(90deg, var(--success), #2ecc71);
             border-radius: 10px;
             transition: width 0.3s;
         }
@@ -298,14 +265,13 @@
         .goal-actions {
             display: flex;
             gap: 10px;
-            margin-top: 15px;
         }
 
         .input-group {
             flex: 2;
             display: flex;
             background: var(--surface-light);
-            border-radius: 60px;
+            border-radius: 40px;
             overflow: hidden;
             border: 1px solid var(--border);
         }
@@ -314,7 +280,7 @@
             flex: 1;
             background: transparent;
             border: none;
-            padding: 10px 15px;
+            padding: 12px 15px;
             color: var(--text);
         }
 
@@ -326,22 +292,19 @@
             background: var(--primary);
             border: none;
             color: white;
-            width: 40px;
-            cursor: pointer;
+            width: 45px;
             font-size: 1.2rem;
-            font-weight: 600;
+            cursor: pointer;
         }
 
         .btn-withdraw {
             flex: 1;
-            background: rgba(214, 48, 49, 0.1);
+            background: rgba(231, 76, 60, 0.1);
             border: 1px solid var(--danger);
             color: var(--danger);
-            padding: 10px;
-            border-radius: 60px;
+            border-radius: 40px;
             cursor: pointer;
             font-weight: 600;
-            transition: 0.2s;
         }
 
         .btn-withdraw:hover {
@@ -360,7 +323,7 @@
         .debt-column {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 28px;
+            border-radius: 24px;
             padding: 24px;
         }
 
@@ -395,20 +358,11 @@
             border-color: var(--primary);
         }
 
-        .debt-name {
-            font-weight: 600;
-        }
-
-        .debt-desc {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-        }
-
         .debt-amount {
             font-weight: 700;
-            background: var(--surface);
             padding: 6px 15px;
-            border-radius: 40px;
+            background: var(--surface);
+            border-radius: 30px;
             border: 1px solid var(--border);
             color: var(--primary);
         }
@@ -421,6 +375,7 @@
             display: flex;
             gap: 10px;
             margin-bottom: 10px;
+            flex-wrap: wrap;
         }
 
         input, select {
@@ -428,14 +383,9 @@
             border: 1px solid var(--border);
             color: var(--text);
             padding: 12px 16px;
-            border-radius: 60px;
+            border-radius: 40px;
             font-size: 0.95rem;
             flex: 1;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--primary);
         }
 
         .btn-add {
@@ -443,19 +393,17 @@
             color: white;
             border: none;
             padding: 14px;
-            border-radius: 60px;
+            border-radius: 40px;
             font-weight: 600;
             cursor: pointer;
             width: 100%;
             margin-top: 10px;
-            transition: 0.2s;
         }
 
         .btn-add:hover {
             background: var(--primary-dark);
         }
 
-        /* Футер */
         .footer {
             margin-top: 40px;
             padding-top: 20px;
@@ -463,20 +411,19 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            color: var(--text-secondary);
             flex-wrap: wrap;
             gap: 15px;
-            color: var(--text-secondary);
         }
 
         .btn-clear {
-            background: rgba(214, 48, 49, 0.1);
+            background: rgba(231, 76, 60, 0.1);
             border: 1px solid var(--danger);
             color: var(--danger);
             padding: 12px 28px;
-            border-radius: 60px;
+            border-radius: 40px;
             cursor: pointer;
             font-weight: 600;
-            transition: 0.2s;
         }
 
         .btn-clear:hover {
@@ -525,7 +472,7 @@
         .modal-btn {
             flex: 1;
             padding: 14px;
-            border-radius: 60px;
+            border-radius: 40px;
             border: none;
             font-weight: 600;
             cursor: pointer;
@@ -542,157 +489,163 @@
             border: 1px solid var(--border);
         }
 
-        /* Адаптивність */
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
                 align-items: flex-start;
             }
-            
-            .pdf-section {
+            .auth-section {
+                width: 100%;
                 flex-direction: column;
             }
-            
+            .btn {
+                width: 100%;
+            }
             .debts-grid {
                 grid-template-columns: 1fr;
-            }
-            
-            .form-row {
-                flex-direction: column;
             }
         }
     </style>
 </head>
 <body>
     <div class="app">
-        <!-- Хедер -->
         <div class="header">
             <div class="logo">
-                <h1>BORGY <span>· менеджер боргів</span></h1>
+                <h1>BORGY · Firebase</h1>
             </div>
-            <div class="user-info">
-                <span>👤 Ваш ID:</span>
-                <span id="userId"></span>
-            </div>
-        </div>
-
-        <!-- PDF кнопки -->
-        <div class="pdf-section">
-            <button class="btn-pdf save" id="savePDFBtn">
-                💾 ЗБЕРЕГТИ БЕКАП
-            </button>
-            <button class="btn-pdf load" id="loadPDFBtn">
-                📂 ВІДНОВИТИ З БЕКАПУ
-            </button>
-        </div>
-
-        <!-- Статистика -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-title">МЕНІ ВИНЕНІ</div>
-                <div class="stat-total" id="totalOwed">0 ₴</div>
-                <div class="stat-item">
-                    <span class="stat-label">Гривня (UAH):</span>
-                    <span class="stat-value" id="owedUAH">0 ₴</span>
+            <div class="auth-section" id="authSection">
+                <div id="userInfo" style="display: none;">
+                    <span class="user-email" id="userEmail"></span>
+                    <button class="btn" id="logoutBtn">ВИЙТИ</button>
                 </div>
-                <div class="stat-item">
-                    <span class="stat-label">Євро (EUR):</span>
-                    <span class="stat-value" id="owedEUR">0 €</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Долар (USD):</span>
-                    <span class="stat-value" id="owedUSD">0 $</span>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-title">Я ВИНЕН</div>
-                <div class="stat-total" id="totalOwe">0 ₴</div>
-                <div class="stat-item">
-                    <span class="stat-label">Гривня (UAH):</span>
-                    <span class="stat-value" id="oweUAH">0 ₴</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Євро (EUR):</span>
-                    <span class="stat-value" id="oweEUR">0 €</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Долар (USD):</span>
-                    <span class="stat-value" id="oweUSD">0 $</span>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-title">ЧИСТИЙ РЕЗУЛЬТАТ</div>
-                <div class="stat-total" id="totalNet">0 ₴</div>
-                <div class="stat-item">
-                    <span class="stat-label">Гривня:</span>
-                    <span class="stat-value" id="netUAH">0 ₴</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Євро:</span>
-                    <span class="stat-value" id="netEUR">0 €</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-label">Долар:</span>
-                    <span class="stat-value" id="netUSD">0 $</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Цілі -->
-        <div class="goals-section">
-            <div class="section-header">
-                <h2>🎯 МОЇ ЦІЛІ</h2>
-                <button class="btn-create" id="createGoalBtn">
-                    + НОВА ЦІЛЬ
+                <button class="btn btn-google" id="loginBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    УВІЙТИ ЧЕРЕЗ GOOGLE
                 </button>
             </div>
-            <div class="goals-grid" id="goalsContainer"></div>
         </div>
 
-        <!-- Борги -->
-        <div class="debts-grid">
-            <!-- Мені винені -->
-            <div class="debt-column">
-                <h3>📥 МЕНІ ВИНЕНІ</h3>
-                <ul class="debt-list" id="owedList"></ul>
-                <div class="form-row">
-                    <input type="text" id="owedName" placeholder="Ім'я">
-                    <input type="number" id="owedAmount" placeholder="Сума" step="0.01">
+        <!-- Контент (тільки для авторизованих) -->
+        <div id="mainContent" style="display: none;">
+            <!-- Статистика -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-title">МЕНІ ВИНЕНІ</div>
+                    <div class="stat-total" id="totalOwed">0 ₴</div>
+                    <div class="stat-item">
+                        <span>Гривня (UAH):</span>
+                        <span id="owedUAH">0 ₴</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Євро (EUR):</span>
+                        <span id="owedEUR">0 €</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Долар (USD):</span>
+                        <span id="owedUSD">0 $</span>
+                    </div>
                 </div>
-                <div class="form-row">
-                    <select id="owedCurrency">
-                        <option value="UAH">🇺🇦 UAH</option>
-                        <option value="EUR">🇪🇺 EUR</option>
-                        <option value="USD">🇺🇸 USD</option>
-                    </select>
-                    <input type="text" id="owedDesc" placeholder="Опис">
+                <div class="stat-card">
+                    <div class="stat-title">Я ВИНЕН</div>
+                    <div class="stat-total" id="totalOwe">0 ₴</div>
+                    <div class="stat-item">
+                        <span>Гривня (UAH):</span>
+                        <span id="oweUAH">0 ₴</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Євро (EUR):</span>
+                        <span id="oweEUR">0 €</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Долар (USD):</span>
+                        <span id="oweUSD">0 $</span>
+                    </div>
                 </div>
-                <button class="btn-add" id="addOwedBtn">+ ДОДАТИ</button>
+                <div class="stat-card">
+                    <div class="stat-title">ЧИСТИЙ РЕЗУЛЬТАТ</div>
+                    <div class="stat-total" id="totalNet">0 ₴</div>
+                    <div class="stat-item">
+                        <span>Гривня:</span>
+                        <span id="netUAH">0 ₴</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Євро:</span>
+                        <span id="netEUR">0 €</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Долар:</span>
+                        <span id="netUSD">0 $</span>
+                    </div>
+                </div>
             </div>
 
-            <!-- Я винен -->
-            <div class="debt-column">
-                <h3>📤 Я ВИНЕН</h3>
-                <ul class="debt-list" id="oweList"></ul>
-                <div class="form-row">
-                    <input type="text" id="oweName" placeholder="Кому">
-                    <input type="number" id="oweAmount" placeholder="Сума" step="0.01">
+            <!-- Цілі -->
+            <div class="goals-section">
+                <div class="section-header">
+                    <h2>🎯 МОЇ ЦІЛІ</h2>
+                    <button class="btn-create" id="createGoalBtn">+ НОВА ЦІЛЬ</button>
                 </div>
-                <div class="form-row">
-                    <select id="oweCurrency">
-                        <option value="UAH">🇺🇦 UAH</option>
-                        <option value="EUR">🇪🇺 EUR</option>
-                        <option value="USD">🇺🇸 USD</option>
-                    </select>
-                    <input type="text" id="oweDesc" placeholder="Опис">
+                <div class="goals-grid" id="goalsContainer">
+                    <div style="grid-column: 1/-1; text-align: center; padding: 60px; background: var(--surface); border-radius: 24px; color: var(--text-secondary); border: 1px dashed var(--border);">
+                        ➕ У вас немає цілей. Створіть свою першу ціль!
+                    </div>
                 </div>
-                <button class="btn-add" id="addOweBtn">+ ДОДАТИ</button>
+            </div>
+
+            <!-- Борги -->
+            <div class="debts-grid">
+                <!-- Мені винені -->
+                <div class="debt-column">
+                    <h3>📥 МЕНІ ВИНЕНІ</h3>
+                    <ul class="debt-list" id="owedList">
+                        <li style="color: var(--text-secondary); text-align: center; padding: 20px;">Поки ніхто не винен</li>
+                    </ul>
+                    <div class="form-row">
+                        <input type="text" id="owedName" placeholder="Ім'я">
+                        <input type="number" id="owedAmount" placeholder="Сума" step="0.01">
+                    </div>
+                    <div class="form-row">
+                        <select id="owedCurrency">
+                            <option value="UAH">🇺🇦 UAH</option>
+                            <option value="EUR">🇪🇺 EUR</option>
+                            <option value="USD">🇺🇸 USD</option>
+                        </select>
+                        <input type="text" id="owedDesc" placeholder="Опис">
+                    </div>
+                    <button class="btn-add" id="addOwedBtn">+ ДОДАТИ</button>
+                </div>
+
+                <!-- Я винен -->
+                <div class="debt-column">
+                    <h3>📤 Я ВИНЕН</h3>
+                    <ul class="debt-list" id="oweList">
+                        <li style="color: var(--text-secondary); text-align: center; padding: 20px;">Поки нікому не винен</li>
+                    </ul>
+                    <div class="form-row">
+                        <input type="text" id="oweName" placeholder="Кому">
+                        <input type="number" id="oweAmount" placeholder="Сума" step="0.01">
+                    </div>
+                    <div class="form-row">
+                        <select id="oweCurrency">
+                            <option value="UAH">🇺🇦 UAH</option>
+                            <option value="EUR">🇪🇺 EUR</option>
+                            <option value="USD">🇺🇸 USD</option>
+                        </select>
+                        <input type="text" id="oweDesc" placeholder="Опис">
+                    </div>
+                    <button class="btn-add" id="addOweBtn">+ ДОДАТИ</button>
+                </div>
             </div>
         </div>
 
-        <!-- Футер -->
-        <div class="footer">
-            <span>⚡ Дані зберігаються локально у вашому браузері</span>
+        <!-- Футер (видно тільки авторизованим) -->
+        <div class="footer" id="footer" style="display: none;">
+            <span>⚡ Дані синхронізуються через Firebase</span>
             <button class="btn-clear" id="clearAllBtn">ОЧИСТИТИ ВСЕ</button>
         </div>
     </div>
@@ -716,482 +669,472 @@
     </div>
 
     <script>
-        (function() {
-            // Генеруємо унікальний ID для користувача (якщо немає)
-            let userId = localStorage.getItem('bordy_user_id');
-            if (!userId) {
-                userId = 'user_' + Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-                localStorage.setItem('bordy_user_id', userId);
+        // 🔥 ТВІЙ КОНФІГ FIREBASE (ТРЕБА ЗАМІНИТИ!)
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            databaseURL: "YOUR_DATABASE_URL",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Ініціалізація Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        // Стан програми
+        let state = {
+            goals: [],
+            debts: {
+                owed: [],
+                owe: []
             }
-            document.getElementById('userId').textContent = userId.substring(0, 8) + '...';
+        };
 
-            // Ключ для зберігання даних конкретного користувача
-            const STORAGE_KEY = 'bordy_data_' + userId;
+        let currentUser = null;
+        let dataListener = null;
 
-            // Стан програми
-            let state = {
-                goals: [],
-                debts: {
-                    owed: [],
-                    owe: []
-                }
-            };
+        // Елементи DOM
+        const loginBtn = document.getElementById('loginBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const userInfo = document.getElementById('userInfo');
+        const userEmail = document.getElementById('userEmail');
+        const mainContent = document.getElementById('mainContent');
+        const footer = document.getElementById('footer');
+        const authSection = document.getElementById('authSection');
 
-            // Завантаження
-            function load() {
-                try {
-                    const saved = localStorage.getItem(STORAGE_KEY);
-                    if (saved) {
-                        const parsed = JSON.parse(saved);
-                        state = {
-                            goals: Array.isArray(parsed.goals) ? parsed.goals : [],
-                            debts: {
-                                owed: Array.isArray(parsed.debts?.owed) ? parsed.debts.owed : [],
-                                owe: Array.isArray(parsed.debts?.owe) ? parsed.debts.owe : []
-                            }
-                        };
-                    } else {
-                        // Демо-дані
-                        state.goals = [
-                            { id: 'g1', name: 'ТЕЛЕФОН', currency: 'EUR', target: 650, saved: 50 }
-                        ];
-                        state.debts = {
-                            owed: [
-                                { id: '1', name: 'Саня', amount: 3400, currency: 'UAH', description: '' },
-                                { id: '4', name: 'Петро', amount: 111, currency: 'EUR', description: '' }
-                            ],
-                            owe: [
-                                { id: '2', name: 'Деніс', amount: 155, currency: 'EUR', description: '' },
-                                { id: '3', name: 'Мама', amount: 2000, currency: 'UAH', description: '' }
-                            ]
-                        };
-                    }
-                } catch (e) {}
-            }
+        // Символ валюти
+        function getSymbol(currency) {
+            if (currency === 'UAH') return '₴';
+            if (currency === 'EUR') return '€';
+            if (currency === 'USD') return '$';
+            return '?';
+        }
 
-            // Збереження
-            function save() {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-            }
+        // Екранування
+        function esc(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
 
-            // Генератор ID
-            function genId() {
-                return Date.now() + '-' + Math.random().toString(36).substring(2, 9);
-            }
+        // Оновлення статистики
+        function updateStats() {
+            let owedUAH = 0, owedEUR = 0, owedUSD = 0;
+            let oweUAH = 0, oweEUR = 0, oweUSD = 0;
 
-            // Символ валюти
-            function getSymbol(currency) {
-                if (currency === 'UAH') return '₴';
-                if (currency === 'EUR') return '€';
-                if (currency === 'USD') return '$';
-                return '?';
-            }
+            state.debts.owed.forEach(item => {
+                const amt = Number(item.amount) || 0;
+                if (item.currency === 'UAH') owedUAH += amt;
+                else if (item.currency === 'EUR') owedEUR += amt;
+                else if (item.currency === 'USD') owedUSD += amt;
+            });
 
-            // Екранування
-            function esc(str) {
-                if (!str) return '';
-                return String(str).replace(/[&<>]/g, function(m) {
-                    if (m === '&') return '&amp;';
-                    if (m === '<') return '&lt;';
-                    if (m === '>') return '&gt;';
-                    return m;
-                });
-            }
+            state.debts.owe.forEach(item => {
+                const amt = Number(item.amount) || 0;
+                if (item.currency === 'UAH') oweUAH += amt;
+                else if (item.currency === 'EUR') oweEUR += amt;
+                else if (item.currency === 'USD') oweUSD += amt;
+            });
 
-            // Оновлення статистики
-            function updateStats() {
-                let owedUAH = 0, owedEUR = 0, owedUSD = 0;
-                let oweUAH = 0, oweEUR = 0, oweUSD = 0;
+            document.getElementById('owedUAH').innerHTML = owedUAH.toFixed(2) + ' ₴';
+            document.getElementById('owedEUR').innerHTML = owedEUR.toFixed(2) + ' €';
+            document.getElementById('owedUSD').innerHTML = owedUSD.toFixed(2) + ' $';
+            document.getElementById('totalOwed').innerHTML = (owedUAH + owedEUR + owedUSD).toFixed(2) + ' ₴';
 
-                state.debts.owed.forEach(item => {
-                    const amt = Number(item.amount) || 0;
-                    if (item.currency === 'UAH') owedUAH += amt;
-                    else if (item.currency === 'EUR') owedEUR += amt;
-                    else if (item.currency === 'USD') owedUSD += amt;
-                });
+            document.getElementById('oweUAH').innerHTML = oweUAH.toFixed(2) + ' ₴';
+            document.getElementById('oweEUR').innerHTML = oweEUR.toFixed(2) + ' €';
+            document.getElementById('oweUSD').innerHTML = oweUSD.toFixed(2) + ' $';
+            document.getElementById('totalOwe').innerHTML = (oweUAH + oweEUR + oweUSD).toFixed(2) + ' ₴';
 
-                state.debts.owe.forEach(item => {
-                    const amt = Number(item.amount) || 0;
-                    if (item.currency === 'UAH') oweUAH += amt;
-                    else if (item.currency === 'EUR') oweEUR += amt;
-                    else if (item.currency === 'USD') oweUSD += amt;
-                });
+            const netUAH = owedUAH - oweUAH;
+            const netEUR = owedEUR - oweEUR;
+            const netUSD = owedUSD - oweUSD;
+            const totalNet = (owedUAH + owedEUR + owedUSD) - (oweUAH + oweEUR + oweUSD);
 
-                document.getElementById('owedUAH').innerHTML = owedUAH.toFixed(2) + ' ₴';
-                document.getElementById('owedEUR').innerHTML = owedEUR.toFixed(2) + ' €';
-                document.getElementById('owedUSD').innerHTML = owedUSD.toFixed(2) + ' $';
-                document.getElementById('totalOwed').innerHTML = (owedUAH + owedEUR + owedUSD).toFixed(2) + ' ₴';
+            document.getElementById('netUAH').innerHTML = (netUAH >= 0 ? '+' : '') + netUAH.toFixed(2) + ' ₴';
+            document.getElementById('netEUR').innerHTML = (netEUR >= 0 ? '+' : '') + netEUR.toFixed(2) + ' €';
+            document.getElementById('netUSD').innerHTML = (netUSD >= 0 ? '+' : '') + netUSD.toFixed(2) + ' $';
+            document.getElementById('totalNet').innerHTML = (totalNet >= 0 ? '+' : '') + totalNet.toFixed(2) + ' ₴';
+        }
 
-                document.getElementById('oweUAH').innerHTML = oweUAH.toFixed(2) + ' ₴';
-                document.getElementById('oweEUR').innerHTML = oweEUR.toFixed(2) + ' €';
-                document.getElementById('oweUSD').innerHTML = oweUSD.toFixed(2) + ' $';
-                document.getElementById('totalOwe').innerHTML = (oweUAH + oweEUR + oweUSD).toFixed(2) + ' ₴';
-
-                const netUAH = owedUAH - oweUAH;
-                const netEUR = owedEUR - oweEUR;
-                const netUSD = owedUSD - oweUSD;
-                const totalNet = (owedUAH + owedEUR + owedUSD) - (oweUAH + oweEUR + oweUSD);
-
-                document.getElementById('netUAH').innerHTML = (netUAH >= 0 ? '+' : '') + netUAH.toFixed(2) + ' ₴';
-                document.getElementById('netEUR').innerHTML = (netEUR >= 0 ? '+' : '') + netEUR.toFixed(2) + ' €';
-                document.getElementById('netUSD').innerHTML = (netUSD >= 0 ? '+' : '') + netUSD.toFixed(2) + ' $';
-                document.getElementById('totalNet').innerHTML = (totalNet >= 0 ? '+' : '') + totalNet.toFixed(2) + ' ₴';
+        // Рендер цілей
+        function renderGoals() {
+            const container = document.getElementById('goalsContainer');
+            
+            if (state.goals.length === 0) {
+                container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px; background: var(--surface); border-radius: 24px; color: var(--text-secondary); border: 1px dashed var(--border);">➕ У вас немає цілей. Створіть свою першу ціль!</div>';
+                return;
             }
 
-            // Рендер цілей
-            function renderGoals() {
-                const container = document.getElementById('goalsContainer');
-                
-                if (state.goals.length === 0) {
-                    container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; padding: 60px; background: var(--surface); border-radius: 28px; color: var(--text-secondary); border: 1px dashed var(--border);">➕ Створіть свою першу ціль</div>';
-                    return;
-                }
+            let html = '';
+            state.goals.forEach(goal => {
+                const symbol = getSymbol(goal.currency);
+                const percent = goal.target > 0 ? (goal.saved / goal.target) * 100 : 0;
+                const remaining = Math.max(0, goal.target - goal.saved);
 
-                let html = '';
-                state.goals.forEach(goal => {
-                    const symbol = getSymbol(goal.currency);
-                    const percent = goal.target > 0 ? (goal.saved / goal.target) * 100 : 0;
-                    const remaining = Math.max(0, goal.target - goal.saved);
-
-                    html += `
-                        <div class="goal-card" data-id="${goal.id}">
-                            <div class="goal-delete" onclick="deleteGoal('${goal.id}')">✕</div>
-                            <div class="goal-name">${esc(goal.name)}</div>
-                            <div class="goal-currency">${goal.currency}</div>
-                            <div class="goal-target">${goal.target.toFixed(0)} ${symbol}</div>
-                            
-                            <div class="goal-progress">
-                                <div class="progress-stats">
-                                    <span>Накопичено: ${goal.saved.toFixed(2)} ${symbol}</span>
-                                    <span>Залишилось: ${remaining.toFixed(2)} ${symbol}</span>
-                                </div>
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: ${Math.min(percent, 100)}%"></div>
-                                </div>
-                            </div>
-
-                            <div class="goal-actions">
-                                <div class="input-group">
-                                    <input type="number" id="add-${goal.id}" placeholder="Сума" step="1" min="0">
-                                    <button onclick="addToGoal('${goal.id}')">+</button>
-                                </div>
-                                <button class="btn-withdraw" onclick="withdrawFromGoal('${goal.id}')">ЗНЯТИ</button>
-                            </div>
+                html += `
+                    <div class="goal-card" data-id="${goal.id}">
+                        <div class="goal-delete" onclick="deleteGoal('${goal.id}')">✕</div>
+                        <div class="goal-name">${esc(goal.name)}</div>
+                        <div class="goal-currency">${goal.currency}</div>
+                        <div class="goal-target">${goal.target.toFixed(0)} ${symbol}</div>
+                        
+                        <div class="progress-stats">
+                            <span>Накопичено: ${goal.saved.toFixed(2)} ${symbol}</span>
+                            <span>Залишилось: ${remaining.toFixed(2)} ${symbol}</span>
                         </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${Math.min(percent, 100)}%"></div>
+                        </div>
+
+                        <div class="goal-actions">
+                            <div class="input-group">
+                                <input type="number" id="add-${goal.id}" placeholder="Сума" step="1" min="0">
+                                <button onclick="addToGoal('${goal.id}')">+</button>
+                            </div>
+                            <button class="btn-withdraw" onclick="withdrawFromGoal('${goal.id}')">ЗНЯТИ</button>
+                        </div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Рендер боргів
+        function renderDebts() {
+            const owedList = document.getElementById('owedList');
+            if (state.debts.owed.length === 0) {
+                owedList.innerHTML = '<li style="color: var(--text-secondary); text-align: center; padding: 20px;">Поки ніхто не винен</li>';
+            } else {
+                let html = '';
+                state.debts.owed.forEach(item => {
+                    const symbol = getSymbol(item.currency);
+                    html += `
+                        <li class="debt-item" data-id="${item.id}">
+                            <div>
+                                <div class="debt-name">${esc(item.name)}</div>
+                                <div class="debt-desc">${esc(item.description) || ''}</div>
+                            </div>
+                            <div class="debt-amount">${Number(item.amount).toFixed(2)} ${symbol}</div>
+                        </li>
                     `;
                 });
+                owedList.innerHTML = html;
 
-                container.innerHTML = html;
-            }
-
-            // Глобальні функції для цілей
-            window.addToGoal = function(goalId) {
-                const input = document.getElementById(`add-${goalId}`);
-                const amount = parseFloat(input.value);
-                if (isNaN(amount) || amount <= 0) {
-                    alert('Введіть суму');
-                    return;
-                }
-
-                const goal = state.goals.find(g => g.id === goalId);
-                if (goal) {
-                    goal.saved += amount;
-                    save();
-                    renderGoals();
-                    updateStats();
-                }
-                input.value = '';
-            };
-
-            window.withdrawFromGoal = function(goalId) {
-                const amount = parseFloat(prompt('Скільки зняти?', '0'));
-                if (isNaN(amount) || amount <= 0) return;
-
-                const goal = state.goals.find(g => g.id === goalId);
-                if (goal) {
-                    if (amount > goal.saved) {
-                        alert('Недостатньо коштів');
-                        return;
-                    }
-                    goal.saved -= amount;
-                    save();
-                    renderGoals();
-                    updateStats();
-                }
-            };
-
-            window.deleteGoal = function(goalId) {
-                if (confirm('Видалити цю ціль?')) {
-                    state.goals = state.goals.filter(g => g.id !== goalId);
-                    save();
-                    renderGoals();
-                    updateStats();
-                }
-            };
-
-            // Рендер боргів
-            function renderDebts() {
-                const owedList = document.getElementById('owedList');
-                if (state.debts.owed.length === 0) {
-                    owedList.innerHTML = '<li style="color: var(--text-secondary); text-align: center; padding: 20px;">Поки ніхто не винен</li>';
-                } else {
-                    let html = '';
-                    state.debts.owed.forEach(item => {
-                        const symbol = getSymbol(item.currency);
-                        html += `
-                            <li class="debt-item" data-id="${item.id}">
-                                <div>
-                                    <div class="debt-name">${esc(item.name)}</div>
-                                    <div class="debt-desc">${esc(item.description) || ''}</div>
-                                </div>
-                                <div class="debt-amount">${Number(item.amount).toFixed(2)} ${symbol}</div>
-                            </li>
-                        `;
-                    });
-                    owedList.innerHTML = html;
-
-                    document.querySelectorAll('#owedList .debt-item').forEach(el => {
-                        el.addEventListener('click', function() {
-                            const id = this.dataset.id;
-                            if (id && confirm('Видалити цей борг?')) {
-                                state.debts.owed = state.debts.owed.filter(d => d.id !== id);
-                                save();
-                                renderDebts();
-                                updateStats();
-                            }
-                        });
-                    });
-                }
-
-                const oweList = document.getElementById('oweList');
-                if (state.debts.owe.length === 0) {
-                    oweList.innerHTML = '<li style="color: var(--text-secondary); text-align: center; padding: 20px;">Поки нікому не винен</li>';
-                } else {
-                    let html = '';
-                    state.debts.owe.forEach(item => {
-                        const symbol = getSymbol(item.currency);
-                        html += `
-                            <li class="debt-item" data-id="${item.id}">
-                                <div>
-                                    <div class="debt-name">${esc(item.name)}</div>
-                                    <div class="debt-desc">${esc(item.description) || ''}</div>
-                                </div>
-                                <div class="debt-amount owe">${Number(item.amount).toFixed(2)} ${symbol}</div>
-                            </li>
-                        `;
-                    });
-                    oweList.innerHTML = html;
-
-                    document.querySelectorAll('#oweList .debt-item').forEach(el => {
-                        el.addEventListener('click', function() {
-                            const id = this.dataset.id;
-                            if (id && confirm('Видалити цей борг?')) {
-                                state.debts.owe = state.debts.owe.filter(d => d.id !== id);
-                                save();
-                                renderDebts();
-                                updateStats();
-                            }
-                        });
-                    });
-                }
-            }
-
-            // Додавання боргів
-            function addOwed() {
-                const name = document.getElementById('owedName').value.trim();
-                const amount = parseFloat(document.getElementById('owedAmount').value);
-                const currency = document.getElementById('owedCurrency').value;
-                const desc = document.getElementById('owedDesc').value.trim();
-
-                if (!name || isNaN(amount) || amount <= 0) {
-                    alert('Заповніть всі поля');
-                    return;
-                }
-
-                state.debts.owed.push({
-                    id: genId(),
-                    name: name,
-                    amount: amount,
-                    currency: currency,
-                    description: desc
-                });
-
-                save();
-                
-                document.getElementById('owedName').value = '';
-                document.getElementById('owedAmount').value = '';
-                document.getElementById('owedDesc').value = '';
-                
-                renderDebts();
-                updateStats();
-            }
-
-            function addOwe() {
-                const name = document.getElementById('oweName').value.trim();
-                const amount = parseFloat(document.getElementById('oweAmount').value);
-                const currency = document.getElementById('oweCurrency').value;
-                const desc = document.getElementById('oweDesc').value.trim();
-
-                if (!name || isNaN(amount) || amount <= 0) {
-                    alert('Заповніть всі поля');
-                    return;
-                }
-
-                state.debts.owe.push({
-                    id: genId(),
-                    name: name,
-                    amount: amount,
-                    currency: currency,
-                    description: desc
-                });
-
-                save();
-                
-                document.getElementById('oweName').value = '';
-                document.getElementById('oweAmount').value = '';
-                document.getElementById('oweDesc').value = '';
-                
-                renderDebts();
-                updateStats();
-            }
-
-            // Очистка всього
-            function clearAll() {
-                if (confirm('Видалити ВСІ дані? Це незворотньо.')) {
-                    state = {
-                        goals: [],
-                        debts: {
-                            owed: [],
-                            owe: []
+                document.querySelectorAll('#owedList .debt-item').forEach(el => {
+                    el.addEventListener('click', function() {
+                        const id = this.dataset.id;
+                        if (id && confirm('Видалити цей борг?')) {
+                            state.debts.owed = state.debts.owed.filter(d => d.id !== id);
+                            saveToFirebase();
+                            renderDebts();
+                            updateStats();
                         }
-                    };
-                    save();
-                    renderGoals();
-                    renderDebts();
-                    updateStats();
-                }
-            }
-
-            // PDF функції
-            function saveToPDF() {
-                const dataToSave = {
-                    goals: state.goals,
-                    debts: state.debts
-                };
-
-                const jsonString = JSON.stringify(dataToSave, null, 2);
-                const blob = new Blob([jsonString], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `bordy-backup-${new Date().toLocaleDateString()}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-
-                alert('✅ Бекап збережено! Файл можна зберігати де завгодно.');
-            }
-
-            function loadFromPDF() {
-                const input = document.createElement('input');
-                input.type = 'file';
-                input.accept = '.json,application/json';
-                
-                input.onchange = function(e) {
-                    const file = e.target.files[0];
-                    if (!file) return;
-
-                    const reader = new FileReader();
-                    reader.onload = function(event) {
-                        try {
-                            const loadedData = JSON.parse(event.target.result);
-                            
-                            if (loadedData && Array.isArray(loadedData.goals) && loadedData.debts) {
-                                state = {
-                                    goals: loadedData.goals || [],
-                                    debts: {
-                                        owed: loadedData.debts?.owed || [],
-                                        owe: loadedData.debts?.owe || []
-                                    }
-                                };
-                                
-                                save();
-                                renderGoals();
-                                renderDebts();
-                                updateStats();
-                                
-                                alert('✅ Дані успішно відновлено!');
-                            } else {
-                                alert('❌ Невірний формат файлу');
-                            }
-                        } catch (error) {
-                            alert('❌ Помилка читання файлу');
-                        }
-                    };
-                    reader.readAsText(file);
-                };
-
-                input.click();
-            }
-
-            // Модалка
-            const modal = document.getElementById('goalModal');
-            
-            document.getElementById('createGoalBtn').addEventListener('click', () => {
-                modal.classList.add('active');
-            });
-
-            document.getElementById('cancelGoalBtn').addEventListener('click', () => {
-                modal.classList.remove('active');
-                document.getElementById('goalName').value = '';
-                document.getElementById('goalTarget').value = '';
-            });
-
-            document.getElementById('saveGoalBtn').addEventListener('click', () => {
-                const name = document.getElementById('goalName').value.trim().toUpperCase();
-                const currency = document.getElementById('goalCurrency').value;
-                const target = parseFloat(document.getElementById('goalTarget').value);
-
-                if (!name) { alert('Введіть назву'); return; }
-                if (isNaN(target) || target <= 0) { alert('Введіть цільову суму'); return; }
-
-                state.goals.push({
-                    id: genId(),
-                    name: name,
-                    currency: currency,
-                    target: target,
-                    saved: 0
+                    });
                 });
+            }
 
-                save();
-                
-                document.getElementById('goalName').value = '';
-                document.getElementById('goalTarget').value = '';
-                modal.classList.remove('active');
-                
+            const oweList = document.getElementById('oweList');
+            if (state.debts.owe.length === 0) {
+                oweList.innerHTML = '<li style="color: var(--text-secondary); text-align: center; padding: 20px;">Поки нікому не винен</li>';
+            } else {
+                let html = '';
+                state.debts.owe.forEach(item => {
+                    const symbol = getSymbol(item.currency);
+                    html += `
+                        <li class="debt-item" data-id="${item.id}">
+                            <div>
+                                <div class="debt-name">${esc(item.name)}</div>
+                                <div class="debt-desc">${esc(item.description) || ''}</div>
+                            </div>
+                            <div class="debt-amount owe">${Number(item.amount).toFixed(2)} ${symbol}</div>
+                        </li>
+                    `;
+                });
+                oweList.innerHTML = html;
+
+                document.querySelectorAll('#oweList .debt-item').forEach(el => {
+                    el.addEventListener('click', function() {
+                        const id = this.dataset.id;
+                        if (id && confirm('Видалити цей борг?')) {
+                            state.debts.owe = state.debts.owe.filter(d => d.id !== id);
+                            saveToFirebase();
+                            renderDebts();
+                            updateStats();
+                        }
+                    });
+                });
+            }
+        }
+
+        // Збереження в Firebase
+        function saveToFirebase() {
+            if (!currentUser) return;
+            database.ref('users/' + currentUser.uid).set({
+                goals: state.goals,
+                debts: state.debts
+            });
+        }
+
+        // Завантаження з Firebase
+        function loadFromFirebase(uid) {
+            database.ref('users/' + uid).once('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    state.goals = data.goals || [];
+                    state.debts = data.debts || { owed: [], owe: [] };
+                } else {
+                    // Якщо немає даних — починаємо з порожнього стану
+                    state.goals = [];
+                    state.debts = { owed: [], owe: [] };
+                }
                 renderGoals();
+                renderDebts();
+                updateStats();
             });
+        }
 
-            modal.addEventListener('click', (e) => {
-                if (e.target === modal) {
-                    modal.classList.remove('active');
+        // Встановлення слухача змін
+        function setupListener(uid) {
+            if (dataListener) {
+                database.ref('users/' + uid).off('value', dataListener);
+            }
+            
+            dataListener = database.ref('users/' + uid).on('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    state.goals = data.goals || [];
+                    state.debts = data.debts || { owed: [], owe: [] };
+                } else {
+                    state.goals = [];
+                    state.debts = { owed: [], owe: [] };
                 }
+                renderGoals();
+                renderDebts();
+                updateStats();
+            });
+        }
+
+        // Генератор ID
+        function genId() {
+            return Date.now() + '-' + Math.random().toString(36).substring(2, 9);
+        }
+
+        // Глобальні функції для цілей
+        window.addToGoal = function(goalId) {
+            const input = document.getElementById(`add-${goalId}`);
+            const amount = parseFloat(input.value);
+            if (isNaN(amount) || amount <= 0) {
+                alert('Введіть суму');
+                return;
+            }
+
+            const goal = state.goals.find(g => g.id === goalId);
+            if (goal) {
+                goal.saved += amount;
+                saveToFirebase();
+                renderGoals();
+                updateStats();
+            }
+            input.value = '';
+        };
+
+        window.withdrawFromGoal = function(goalId) {
+            const amount = parseFloat(prompt('Скільки зняти?', '0'));
+            if (isNaN(amount) || amount <= 0) return;
+
+            const goal = state.goals.find(g => g.id === goalId);
+            if (goal) {
+                if (amount > goal.saved) {
+                    alert('Недостатньо коштів');
+                    return;
+                }
+                goal.saved -= amount;
+                saveToFirebase();
+                renderGoals();
+                updateStats();
+            }
+        };
+
+        window.deleteGoal = function(goalId) {
+            if (confirm('Видалити цю ціль?')) {
+                state.goals = state.goals.filter(g => g.id !== goalId);
+                saveToFirebase();
+                renderGoals();
+                updateStats();
+            }
+        };
+
+        // Додавання боргів
+        function addOwed() {
+            const name = document.getElementById('owedName').value.trim();
+            const amount = parseFloat(document.getElementById('owedAmount').value);
+            const currency = document.getElementById('owedCurrency').value;
+            const desc = document.getElementById('owedDesc').value.trim();
+
+            if (!name || isNaN(amount) || amount <= 0) {
+                alert('Заповніть всі поля');
+                return;
+            }
+
+            state.debts.owed.push({
+                id: genId(),
+                name: name,
+                amount: amount,
+                currency: currency,
+                description: desc
             });
 
-            // Ініціалізація
-            load();
-            renderGoals();
+            saveToFirebase();
+            
+            document.getElementById('owedName').value = '';
+            document.getElementById('owedAmount').value = '';
+            document.getElementById('owedDesc').value = '';
+            
             renderDebts();
             updateStats();
+        }
 
-            // Обробники
-            document.getElementById('savePDFBtn').addEventListener('click', saveToPDF);
-            document.getElementById('loadPDFBtn').addEventListener('click', loadFromPDF);
-            document.getElementById('addOwedBtn').addEventListener('click', addOwed);
-            document.getElementById('addOweBtn').addEventListener('click', addOwe);
-            document.getElementById('clearAllBtn').addEventListener('click', clearAll);
-        })();
+        function addOwe() {
+            const name = document.getElementById('oweName').value.trim();
+            const amount = parseFloat(document.getElementById('oweAmount').value);
+            const currency = document.getElementById('oweCurrency').value;
+            const desc = document.getElementById('oweDesc').value.trim();
+
+            if (!name || isNaN(amount) || amount <= 0) {
+                alert('Заповніть всі поля');
+                return;
+            }
+
+            state.debts.owe.push({
+                id: genId(),
+                name: name,
+                amount: amount,
+                currency: currency,
+                description: desc
+            });
+
+            saveToFirebase();
+            
+            document.getElementById('oweName').value = '';
+            document.getElementById('oweAmount').value = '';
+            document.getElementById('oweDesc').value = '';
+            
+            renderDebts();
+            updateStats();
+        }
+
+        // Очистка всього
+        function clearAll() {
+            if (confirm('Видалити ВСІ дані? Це незворотньо.')) {
+                state = {
+                    goals: [],
+                    debts: {
+                        owed: [],
+                        owe: []
+                    }
+                };
+                saveToFirebase();
+                renderGoals();
+                renderDebts();
+                updateStats();
+            }
+        }
+
+        // Модалка
+        const modal = document.getElementById('goalModal');
+        
+        document.getElementById('createGoalBtn').addEventListener('click', () => {
+            modal.classList.add('active');
+        });
+
+        document.getElementById('cancelGoalBtn').addEventListener('click', () => {
+            modal.classList.remove('active');
+            document.getElementById('goalName').value = '';
+            document.getElementById('goalTarget').value = '';
+        });
+
+        document.getElementById('saveGoalBtn').addEventListener('click', () => {
+            const name = document.getElementById('goalName').value.trim().toUpperCase();
+            const currency = document.getElementById('goalCurrency').value;
+            const target = parseFloat(document.getElementById('goalTarget').value);
+
+            if (!name) { alert('Введіть назву'); return; }
+            if (isNaN(target) || target <= 0) { alert('Введіть цільову суму'); return; }
+
+            state.goals.push({
+                id: genId(),
+                name: name,
+                currency: currency,
+                target: target,
+                saved: 0
+            });
+
+            saveToFirebase();
+            
+            document.getElementById('goalName').value = '';
+            document.getElementById('goalTarget').value = '';
+            modal.classList.remove('active');
+            
+            renderGoals();
+            updateStats();
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+
+        // Аутентифікація
+        loginBtn.addEventListener('click', () => {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            auth.signInWithPopup(provider);
+        });
+
+        logoutBtn.addEventListener('click', () => {
+            auth.signOut();
+        });
+
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // Користувач увійшов
+                currentUser = user;
+                userEmail.textContent = user.email;
+                userInfo.style.display = 'flex';
+                loginBtn.style.display = 'none';
+                mainContent.style.display = 'block';
+                footer.style.display = 'flex';
+                
+                // Завантажуємо дані
+                loadFromFirebase(user.uid);
+                setupListener(user.uid);
+            } else {
+                // Користувач вийшов
+                currentUser = null;
+                userInfo.style.display = 'none';
+                loginBtn.style.display = 'flex';
+                mainContent.style.display = 'none';
+                footer.style.display = 'none';
+                
+                // Очищаємо стан
+                state = { goals: [], debts: { owed: [], owe: [] } };
+            }
+        });
+
+        // Обробники кнопок
+        document.getElementById('addOwedBtn').addEventListener('click', addOwed);
+        document.getElementById('addOweBtn').addEventListener('click', addOwe);
+        document.getElementById('clearAllBtn').addEventListener('click', clearAll);
     </script>
 </body>
 </html>
