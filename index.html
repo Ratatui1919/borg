@@ -737,7 +737,7 @@
             color: #6a7a9c;
         }
 
-        /* Фікс для прапорців */
+        /* Виправлені стилі для селектів з прапорцями */
         .debt-select {
             padding: 14px 18px;
             background: rgba(30, 36, 48, 0.8);
@@ -748,41 +748,54 @@
             appearance: none;
             -webkit-appearance: none;
             -moz-appearance: none;
-            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2300e6c8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2300e6c8' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");
             background-repeat: no-repeat;
             background-position: right 15px center;
             background-size: 16px;
+            font-size: 1rem;
         }
 
+        /* Стилі для опцій */
         .debt-select option {
             background: #1a1f2c;
             color: white;
-            padding: 10px;
+            padding: 12px;
+            font-size: 1rem;
         }
 
-        /* Стилі для опцій з прапорцями */
+        /* Спеціальні стилі для відображення прапорців */
         .debt-select option[value="UAH"] {
-            background-image: url('https://flagcdn.com/ua.svg');
+            background-image: url('https://flagcdn.com/w20/ua.png');
             background-repeat: no-repeat;
             background-position: 10px center;
-            background-size: 20px;
+            background-size: 20px 15px;
             padding-left: 35px;
         }
 
         .debt-select option[value="EUR"] {
-            background-image: url('https://flagcdn.com/eu.svg');
+            background-image: url('https://flagcdn.com/w20/eu.png');
             background-repeat: no-repeat;
             background-position: 10px center;
-            background-size: 20px;
+            background-size: 20px 15px;
             padding-left: 35px;
         }
 
         .debt-select option[value="USD"] {
-            background-image: url('https://flagcdn.com/us.svg');
+            background-image: url('https://flagcdn.com/w20/us.png');
             background-repeat: no-repeat;
             background-position: 10px center;
-            background-size: 20px;
+            background-size: 20px 15px;
             padding-left: 35px;
+        }
+
+        /* Для Firefox */
+        @-moz-document url-prefix() {
+            .debt-select option {
+                padding-left: 35px;
+                background-position: 10px center;
+                background-repeat: no-repeat;
+                background-size: 20px 15px;
+            }
         }
 
         .debt-btn {
@@ -1757,75 +1770,6 @@
             'alcohol': 'fa-wine-bottle',
             'other': 'fa-ellipsis'
         };
-
-        // Pull-to-refresh
-        let startY = 0;
-        let currentY = 0;
-        let isPulling = false;
-        let isRefreshing = false;
-        const threshold = 80;
-
-        document.addEventListener('touchstart', (e) => {
-            if (window.pageYOffset <= 0 && !isRefreshing) {
-                startY = e.touches[0].clientY;
-                isPulling = true;
-            }
-        }, { passive: true });
-
-        document.addEventListener('touchmove', (e) => {
-            if (!isPulling || isRefreshing) return;
-
-            currentY = e.touches[0].clientY;
-            const diff = currentY - startY;
-
-            if (diff > 0) {
-                e.preventDefault();
-
-                if (diff > threshold) {
-                    refreshIndicator.classList.add('active');
-                } else {
-                    refreshIndicator.classList.remove('active');
-                }
-            }
-        }, { passive: false });
-
-        document.addEventListener('touchend', async () => {
-            if (!isPulling || isRefreshing) return;
-
-            const diff = currentY - startY;
-
-            if (diff > threshold) {
-                isRefreshing = true;
-
-                if (currentUser) {
-                    await database.ref('users/' + currentUser.uid).once('value')
-                        .then(snapshot => {
-                            const data = snapshot.val();
-                            if (data) {
-                                state.goals = data.goals || [];
-                                state.debts = data.debts || { owed: [], owe: [] };
-                                state.transactions = data.transactions || { EUR: [], UAH: [] };
-                            }
-
-                            renderGoals();
-                            renderDebts();
-                            updateDebtStats();
-                            updateJournal();
-                        });
-                }
-
-                setTimeout(() => {
-                    refreshIndicator.classList.remove('active');
-                    isRefreshing = false;
-                }, 600);
-            } else {
-                refreshIndicator.classList.remove('active');
-            }
-
-            isPulling = false;
-            startY = 0;
-            currentY = 0;
-        });
 
         // Навігація
         tabDebts.addEventListener('click', () => {
