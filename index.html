@@ -359,6 +359,44 @@
             border: 1px solid rgba(0, 230, 200, 0.3);
         }
 
+        /* Вкладки валют для щоденника */
+        .currency-tabs {
+            display: flex;
+            gap: 10px;
+            background: rgba(18, 24, 34, 0.6);
+            padding: 6px;
+            border-radius: 40px;
+            border: 1px solid rgba(0, 230, 200, 0.1);
+            margin-bottom: 25px;
+        }
+
+        .currency-tab {
+            flex: 1;
+            padding: 10px 20px;
+            border-radius: 40px;
+            background: transparent;
+            border: none;
+            color: #8c9cc0;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .currency-tab i {
+            font-size: 1rem;
+        }
+
+        .currency-tab.active {
+            background: linear-gradient(135deg, rgba(0, 230, 200, 0.15), rgba(0, 153, 255, 0.15));
+            color: #00e6c8;
+            border: 1px solid rgba(0, 230, 200, 0.3);
+        }
+
         /* Статистика */
         .stats-grid {
             display: grid;
@@ -497,7 +535,6 @@
             transition: width 0.4s;
         }
 
-        /* Історія цілей */
         .goal-history {
             margin: 20px 0;
             padding: 15px;
@@ -1129,6 +1166,18 @@
                 font-size: 1.3rem;
             }
 
+            .currency-tabs {
+                margin-bottom: 20px;
+            }
+
+            .currency-tab span {
+                display: none;
+            }
+
+            .currency-tab i {
+                font-size: 1.2rem;
+            }
+
             .stats-grid {
                 grid-template-columns: 1fr;
             }
@@ -1373,75 +1422,164 @@
                         </div>
                     </div>
 
-                    <div class="journal-stats">
-                        <div class="journal-card">
-                            <div class="journal-label">💰 Зароблено</div>
-                            <div class="journal-value income" id="monthIncome">0 €</div>
+                    <!-- Вкладки валют -->
+                    <div class="currency-tabs">
+                        <button class="currency-tab active" data-currency="EUR">
+                            <i class="fas fa-euro-sign"></i>
+                            <span>Євро</span>
+                        </button>
+                        <button class="currency-tab" data-currency="UAH">
+                            <i class="fas fa-hryvnia"></i>
+                            <span>Гривня</span>
+                        </button>
+                    </div>
+
+                    <!-- Євро контент -->
+                    <div id="eurContent">
+                        <div class="journal-stats">
+                            <div class="journal-card">
+                                <div class="journal-label">💰 Зароблено</div>
+                                <div class="journal-value income" id="eurIncome">0 €</div>
+                            </div>
+                            <div class="journal-card">
+                                <div class="journal-label">💸 Витрачено</div>
+                                <div class="journal-value expense" id="eurExpense">0 €</div>
+                            </div>
+                            <div class="journal-card">
+                                <div class="journal-label">⚖️ Залишок</div>
+                                <div class="journal-value" id="eurBalance">0 €</div>
+                            </div>
                         </div>
-                        <div class="journal-card">
-                            <div class="journal-label">💸 Витрачено</div>
-                            <div class="journal-value expense" id="monthExpense">0 €</div>
+
+                        <div class="charts-grid">
+                            <div class="chart-card">
+                                <div class="chart-header">
+                                    <div class="chart-title">
+                                        <i class="fas fa-chart-pie"></i> Розподіл витрат
+                                    </div>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="eurExpensesChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="chart-card">
+                                <div class="chart-header">
+                                    <div class="chart-title">
+                                        <i class="fas fa-chart-line"></i> Динаміка
+                                    </div>
+                                    <div class="chart-legend">
+                                        <div class="legend-item">
+                                            <span class="legend-color income"></span>
+                                            <span>Дохід</span>
+                                        </div>
+                                        <div class="legend-item">
+                                            <span class="legend-color expense"></span>
+                                            <span>Витрати</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="eurDynamicsChart"></canvas>
+                                </div>
+                            </div>
                         </div>
-                        <div class="journal-card">
-                            <div class="journal-label">⚖️ Залишок</div>
-                            <div class="journal-value" id="monthBalance">0 €</div>
+
+                        <div class="transactions-section">
+                            <div class="transactions-header">
+                                <h3 style="color: #e0e5ff; font-size: 1.2rem;">
+                                    <i class="fas fa-list"></i> Операції в євро
+                                </h3>
+                                <button class="btn-add" onclick="openTransactionModal('EUR')">
+                                    <i class="fas fa-plus"></i> Додати
+                                </button>
+                            </div>
+                            <table class="transactions-table">
+                                <thead>
+                                    <tr>
+                                        <th>Дата</th>
+                                        <th>Категорія</th>
+                                        <th>Опис</th>
+                                        <th>Сума</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="eurTransactionsList"></tbody>
+                            </table>
                         </div>
                     </div>
 
-                    <div class="charts-grid">
-                        <div class="chart-card">
-                            <div class="chart-header">
-                                <div class="chart-title">
-                                    <i class="fas fa-chart-pie"></i> Розподіл витрат
-                                </div>
+                    <!-- Гривня контент -->
+                    <div id="uahContent" style="display: none;">
+                        <div class="journal-stats">
+                            <div class="journal-card">
+                                <div class="journal-label">💰 Зароблено</div>
+                                <div class="journal-value income" id="uahIncome">0 ₴</div>
                             </div>
-                            <div class="chart-container">
-                                <canvas id="expensesChart"></canvas>
+                            <div class="journal-card">
+                                <div class="journal-label">💸 Витрачено</div>
+                                <div class="journal-value expense" id="uahExpense">0 ₴</div>
                             </div>
-                        </div>
-                        <div class="chart-card">
-                            <div class="chart-header">
-                                <div class="chart-title">
-                                    <i class="fas fa-chart-line"></i> Динаміка
-                                </div>
-                                <div class="chart-legend">
-                                    <div class="legend-item">
-                                        <span class="legend-color income"></span>
-                                        <span>Дохід</span>
-                                    </div>
-                                    <div class="legend-item">
-                                        <span class="legend-color expense"></span>
-                                        <span>Витрати</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="dynamicsChart"></canvas>
+                            <div class="journal-card">
+                                <div class="journal-label">⚖️ Залишок</div>
+                                <div class="journal-value" id="uahBalance">0 ₴</div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="transactions-section">
-                        <div class="transactions-header">
-                            <h3 style="color: #e0e5ff; font-size: 1.2rem;">
-                                <i class="fas fa-list"></i> Операції за місяць
-                            </h3>
-                            <button class="btn-add" id="addTransactionBtn">
-                                <i class="fas fa-plus"></i> Додати
-                            </button>
+                        <div class="charts-grid">
+                            <div class="chart-card">
+                                <div class="chart-header">
+                                    <div class="chart-title">
+                                        <i class="fas fa-chart-pie"></i> Розподіл витрат
+                                    </div>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="uahExpensesChart"></canvas>
+                                </div>
+                            </div>
+                            <div class="chart-card">
+                                <div class="chart-header">
+                                    <div class="chart-title">
+                                        <i class="fas fa-chart-line"></i> Динаміка
+                                    </div>
+                                    <div class="chart-legend">
+                                        <div class="legend-item">
+                                            <span class="legend-color income"></span>
+                                            <span>Дохід</span>
+                                        </div>
+                                        <div class="legend-item">
+                                            <span class="legend-color expense"></span>
+                                            <span>Витрати</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="uahDynamicsChart"></canvas>
+                                </div>
+                            </div>
                         </div>
-                        <table class="transactions-table">
-                            <thead>
-                                <tr>
-                                    <th>Дата</th>
-                                    <th>Категорія</th>
-                                    <th>Опис</th>
-                                    <th>Сума</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="transactionsList"></tbody>
-                        </table>
+
+                        <div class="transactions-section">
+                            <div class="transactions-header">
+                                <h3 style="color: #e0e5ff; font-size: 1.2rem;">
+                                    <i class="fas fa-list"></i> Операції в гривні
+                                </h3>
+                                <button class="btn-add" onclick="openTransactionModal('UAH')">
+                                    <i class="fas fa-plus"></i> Додати
+                                </button>
+                            </div>
+                            <table class="transactions-table">
+                                <thead>
+                                    <tr>
+                                        <th>Дата</th>
+                                        <th>Категорія</th>
+                                        <th>Опис</th>
+                                        <th>Сума</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="uahTransactionsList"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1470,6 +1608,7 @@
     <div class="modal" id="transactionModal">
         <div class="modal-content">
             <h2>📝 Нова операція</h2>
+            <input type="hidden" id="transactionCurrency">
             <select class="modal-select" id="transactionType">
                 <option value="income">💰 Дохід</option>
                 <option value="expense">💸 Витрата</option>
@@ -1510,7 +1649,10 @@
         let state = {
             goals: [],
             debts: { owed: [], owe: [] },
-            transactions: [],
+            transactions: {
+                EUR: [],
+                UAH: []
+            },
             categories: {
                 income: ['salary', 'gift', 'freelance', 'investment', 'other'],
                 expense: ['food', 'transport', 'health', 'clothes', 'entertainment', 'cigarettes', 'alcohol', 'other']
@@ -1518,8 +1660,14 @@
         };
         let currentUser = null;
         let currentMonth = new Date();
-        let expensesChart = null;
-        let dynamicsChart = null;
+        let currentCurrency = 'EUR';
+        
+        // Чарти
+        let eurExpensesChart = null;
+        let eurDynamicsChart = null;
+        let uahExpensesChart = null;
+        let uahDynamicsChart = null;
+        
         let selectedCategory = null;
 
         // DOM елементи
@@ -1536,12 +1684,17 @@
         const debtsPage = document.getElementById('debtsPage');
         const journalPage = document.getElementById('journalPage');
 
+        // Вкладки валют
+        const eurContent = document.getElementById('eurContent');
+        const uahContent = document.getElementById('uahContent');
+        const currencyTabs = document.querySelectorAll('.currency-tab');
+
         // Модалки
         const goalModal = document.getElementById('goalModal');
         const transactionModal = document.getElementById('transactionModal');
+        const transactionCurrency = document.getElementById('transactionCurrency');
         const transactionType = document.getElementById('transactionType');
         const categoryButtons = document.getElementById('categoryButtons');
-        const categoryTitle = document.getElementById('categoryTitle');
 
         // Переклад категорій
         const categoryTranslations = {
@@ -1575,7 +1728,7 @@
             'other': 'fa-ellipsis'
         };
 
-        // Pull-to-refresh (новий, без перезавантаження)
+        // Pull-to-refresh
         let startY = 0;
         let currentY = 0;
         let isPulling = false;
@@ -1621,7 +1774,7 @@
                             if (data) {
                                 state.goals = data.goals || [];
                                 state.debts = data.debts || { owed: [], owe: [] };
-                                state.transactions = data.transactions || [];
+                                state.transactions = data.transactions || { EUR: [], UAH: [] };
                             }
 
                             renderGoals();
@@ -1660,6 +1813,26 @@
             updateJournal();
         });
 
+        // Перемикання валют
+        currencyTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                currencyTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                currentCurrency = tab.dataset.currency;
+                
+                if (currentCurrency === 'EUR') {
+                    eurContent.style.display = 'block';
+                    uahContent.style.display = 'none';
+                } else {
+                    eurContent.style.display = 'none';
+                    uahContent.style.display = 'block';
+                }
+                
+                updateJournal();
+            });
+        });
+
         // Місяці
         document.getElementById('prevMonth').addEventListener('click', () => {
             currentMonth.setMonth(currentMonth.getMonth() - 1);
@@ -1677,6 +1850,15 @@
             document.getElementById('currentMonth').innerHTML = 
                 currentMonth.toLocaleDateString('uk-UA', { month: 'long', year: 'numeric' });
         }
+
+        // Відкриття модалки транзакції
+        window.openTransactionModal = function(currency) {
+            selectedCategory = null;
+            transactionCurrency.value = currency;
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
+            updateCategoryButtons();
+            transactionModal.classList.add('active');
+        };
 
         // Оновлення категорій в модалці
         transactionType.addEventListener('change', () => {
@@ -1774,14 +1956,12 @@
             if (goal && goal.history) {
                 const operation = goal.history[historyIndex];
                 
-                // Повертаємо суму назад
                 if (operation.type === 'add') {
                     goal.saved -= operation.amount;
                 } else {
                     goal.saved += operation.amount;
                 }
                 
-                // Видаляємо з історії
                 goal.history.splice(historyIndex, 1);
                 saveToFirebase();
             }
@@ -1799,7 +1979,6 @@
                 const s = getSymbol(g.currency);
                 const p = g.target > 0 ? (g.saved / g.target) * 100 : 0;
                 
-                // Історія операцій
                 const historyHtml = (g.history || []).map((h, index) => `
                     <div class="history-item">
                         <div class="history-item-content">
@@ -1901,74 +2080,70 @@
         // Оновлення щоденника
         function updateJournal() {
             const monthKey = getMonthKey(currentMonth);
-            const monthTransactions = state.transactions?.filter(t => t.month === monthKey) || [];
             
-            const income = monthTransactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
-            const expense = monthTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+            // Євро
+            const eurTransactions = state.transactions.EUR?.filter(t => t.month === monthKey) || [];
+            const eurIncome = eurTransactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+            const eurExpense = eurTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
             
-            document.getElementById('monthIncome').innerHTML = income.toFixed(2) + ' €';
-            document.getElementById('monthExpense').innerHTML = expense.toFixed(2) + ' €';
-            document.getElementById('monthBalance').innerHTML = (income - expense).toFixed(2) + ' €';
+            document.getElementById('eurIncome').innerHTML = eurIncome.toFixed(2) + ' €';
+            document.getElementById('eurExpense').innerHTML = eurExpense.toFixed(2) + ' €';
+            document.getElementById('eurBalance').innerHTML = (eurIncome - eurExpense).toFixed(2) + ' €';
 
-            // Список транзакцій
-            const tbody = document.getElementById('transactionsList');
-            if (monthTransactions.length === 0) {
+            // Гривня
+            const uahTransactions = state.transactions.UAH?.filter(t => t.month === monthKey) || [];
+            const uahIncome = uahTransactions.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+            const uahExpense = uahTransactions.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+            
+            document.getElementById('uahIncome').innerHTML = uahIncome.toFixed(2) + ' ₴';
+            document.getElementById('uahExpense').innerHTML = uahExpense.toFixed(2) + ' ₴';
+            document.getElementById('uahBalance').innerHTML = (uahIncome - uahExpense).toFixed(2) + ' ₴';
+
+            // Списки транзакцій
+            renderTransactionsList('eurTransactionsList', eurTransactions, '€');
+            renderTransactionsList('uahTransactionsList', uahTransactions, '₴');
+
+            // Оновлення діаграм
+            updateCharts('eur', eurTransactions);
+            updateCharts('uah', uahTransactions);
+        }
+
+        function renderTransactionsList(elementId, transactions, symbol) {
+            const tbody = document.getElementById(elementId);
+            if (transactions.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#8c9cc0; padding:30px;">Немає операцій за цей місяць</td></tr>';
             } else {
-                tbody.innerHTML = monthTransactions.sort((a, b) => b.date - a.date).map(t => {
-                    const date = new Date(t.date);
-                    const monthKey = getMonthKey(date);
-                    
+                tbody.innerHTML = transactions.sort((a, b) => b.date - a.date).map(t => {
                     return `<tr>
-                        <td>${date.toLocaleDateString('uk-UA')}</td>
+                        <td>${new Date(t.date).toLocaleDateString('uk-UA')}</td>
                         <td><span class="category-badge">${categoryTranslations[t.category] || t.category}</span></td>
                         <td>${esc(t.description) || '-'}</td>
                         <td><span class="${t.type === 'income' ? 'income-text' : 'expense-text'}">
-                            ${t.type === 'income' ? '+' : '-'}${t.amount.toFixed(2)} €
+                            ${t.type === 'income' ? '+' : '-'}${t.amount.toFixed(2)} ${symbol}
                         </span></td>
-                        <td><i class="fas fa-trash-alt delete-btn" onclick="deleteTransaction('${t.id}')"></i></td>
+                        <td><i class="fas fa-trash-alt delete-btn" onclick="deleteTransaction('${t.id}', '${elementId === 'eurTransactionsList' ? 'EUR' : 'UAH'}')"></i></td>
                     </tr>`;
                 }).join('');
             }
-
-            // Оновлення діаграм
-            updateCharts(monthTransactions);
         }
 
         // Оновлення діаграм
-        function updateCharts(transactions) {
+        function updateCharts(currency, transactions) {
             const expensesByCategory = {};
             transactions.filter(t => t.type === 'expense').forEach(t => {
                 const catName = categoryTranslations[t.category] || t.category;
                 expensesByCategory[catName] = (expensesByCategory[catName] || 0) + t.amount;
             });
 
-            const ctx1 = document.getElementById('expensesChart').getContext('2d');
-            if (expensesChart) expensesChart.destroy();
+            const ctx1 = document.getElementById(currency + 'ExpensesChart').getContext('2d');
+            if (currency === 'eur' && eurExpensesChart) eurExpensesChart.destroy();
+            if (currency === 'uah' && uahExpensesChart) uahExpensesChart.destroy();
             
-            if (Object.keys(expensesByCategory).length === 0) {
-                expensesChart = new Chart(ctx1, {
-                    type: 'doughnut',
-                    data: { 
-                        labels: ['Немає даних'], 
-                        datasets: [{ 
-                            data: [1], 
-                            backgroundColor: ['#8c9cc0'],
-                            borderWidth: 0
-                        }] 
-                    },
-                    options: { 
-                        responsive: true, 
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false }
-                        }
-                    }
-                });
-            } else {
-                expensesChart = new Chart(ctx1, {
-                    type: 'doughnut',
-                    data: {
+            const chart1 = new Chart(ctx1, {
+                type: 'doughnut',
+                data: Object.keys(expensesByCategory).length === 0 ? 
+                    { labels: ['Немає даних'], datasets: [{ data: [1], backgroundColor: ['#8c9cc0'], borderWidth: 0 }] } :
+                    {
                         labels: Object.keys(expensesByCategory),
                         datasets: [{
                             data: Object.values(expensesByCategory),
@@ -1976,20 +2151,20 @@
                             borderWidth: 0
                         }]
                     },
-                    options: { 
-                        responsive: true, 
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { 
-                                position: 'bottom',
-                                labels: { color: '#8c9cc0', font: { size: 12 } }
-                            }
-                        }
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: Object.keys(expensesByCategory).length === 0 ? { display: false } : 
+                            { position: 'bottom', labels: { color: '#8c9cc0', font: { size: 12 } } }
                     }
-                });
-            }
+                }
+            });
 
-            // Динаміка - групуємо по днях
+            if (currency === 'eur') eurExpensesChart = chart1;
+            else uahExpensesChart = chart1;
+
+            // Динаміка
             const dailyData = {};
             transactions.forEach(t => {
                 const date = new Date(t.date);
@@ -2006,93 +2181,78 @@
                 }
             });
 
-            // Сортуємо по даті
             const sortedDays = Object.keys(dailyData).sort((a, b) => {
                 const dateA = dailyData[a].date;
                 const dateB = dailyData[b].date;
                 return dateA - dateB;
             });
 
-            const ctx2 = document.getElementById('dynamicsChart').getContext('2d');
-            if (dynamicsChart) dynamicsChart.destroy();
+            const ctx2 = document.getElementById(currency + 'DynamicsChart').getContext('2d');
+            if (currency === 'eur' && eurDynamicsChart) eurDynamicsChart.destroy();
+            if (currency === 'uah' && uahDynamicsChart) uahDynamicsChart.destroy();
             
-            if (sortedDays.length === 0) {
-                dynamicsChart = new Chart(ctx2, {
-                    type: 'line',
-                    data: {
-                        labels: ['Немає даних'],
-                        datasets: [
-                            { label: 'Дохід', data: [0], borderColor: '#6fcf97', backgroundColor: 'rgba(111,207,151,0.1)' },
-                            { label: 'Витрати', data: [0], borderColor: '#ff9f9f', backgroundColor: 'rgba(255,159,159,0.1)' }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } }
-                    }
-                });
-            } else {
-                dynamicsChart = new Chart(ctx2, {
-                    type: 'line',
-                    data: {
-                        labels: sortedDays,
-                        datasets: [
-                            { 
-                                label: 'Дохід', 
-                                data: sortedDays.map(d => dailyData[d].income), 
-                                borderColor: '#6fcf97',
-                                backgroundColor: 'rgba(111, 207, 151, 0.1)',
-                                tension: 0.4,
-                                fill: true,
-                                pointBackgroundColor: '#6fcf97',
-                                pointBorderColor: '#fff',
-                                pointBorderWidth: 2,
-                                pointRadius: 4
-                            },
-                            { 
-                                label: 'Витрати', 
-                                data: sortedDays.map(d => dailyData[d].expense), 
-                                borderColor: '#ff9f9f',
-                                backgroundColor: 'rgba(255, 159, 159, 0.1)',
-                                tension: 0.4,
-                                fill: true,
-                                pointBackgroundColor: '#ff9f9f',
-                                pointBorderColor: '#fff',
-                                pointBorderWidth: 2,
-                                pointRadius: 4
-                            }
-                        ]
-                    },
-                    options: { 
-                        responsive: true, 
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: { 
-                                mode: 'index', 
-                                intersect: false,
-                                backgroundColor: '#1a1f2c',
-                                titleColor: '#e0e5ff',
-                                bodyColor: '#8c9cc0',
-                                borderColor: '#00e6c8',
-                                borderWidth: 1
-                            }
+            const chart2 = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: sortedDays,
+                    datasets: [
+                        { 
+                            label: 'Дохід', 
+                            data: sortedDays.map(d => dailyData[d]?.income || 0), 
+                            borderColor: '#6fcf97',
+                            backgroundColor: 'rgba(111, 207, 151, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            pointBackgroundColor: '#6fcf97',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4
                         },
-                        scales: {
-                            y: { 
-                                beginAtZero: true,
-                                grid: { color: 'rgba(255,255,255,0.05)' },
-                                ticks: { color: '#8c9cc0' }
-                            },
-                            x: { 
-                                grid: { display: false },
-                                ticks: { color: '#8c9cc0', maxRotation: 45, minRotation: 45 }
-                            }
+                        { 
+                            label: 'Витрати', 
+                            data: sortedDays.map(d => dailyData[d]?.expense || 0), 
+                            borderColor: '#ff9f9f',
+                            backgroundColor: 'rgba(255, 159, 159, 0.1)',
+                            tension: 0.4,
+                            fill: true,
+                            pointBackgroundColor: '#ff9f9f',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4
+                        }
+                    ]
+                },
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { 
+                            mode: 'index', 
+                            intersect: false,
+                            backgroundColor: '#1a1f2c',
+                            titleColor: '#e0e5ff',
+                            bodyColor: '#8c9cc0',
+                            borderColor: '#00e6c8',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        y: { 
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255,255,255,0.05)' },
+                            ticks: { color: '#8c9cc0' }
+                        },
+                        x: { 
+                            grid: { display: false },
+                            ticks: { color: '#8c9cc0', maxRotation: 45, minRotation: 45 }
                         }
                     }
-                });
-            }
+                }
+            });
+
+            if (currency === 'eur') eurDynamicsChart = chart2;
+            else uahDynamicsChart = chart2;
         }
 
         // Firebase
@@ -2101,7 +2261,7 @@
             database.ref('users/' + currentUser.uid).set({
                 goals: state.goals || [],
                 debts: state.debts,
-                transactions: state.transactions || [],
+                transactions: state.transactions || { EUR: [], UAH: [] },
                 categories: state.categories
             });
         }
@@ -2112,7 +2272,7 @@
                 if (data) {
                     state.goals = data.goals || [];
                     state.debts = data.debts || { owed: [], owe: [] };
-                    state.transactions = data.transactions || [];
+                    state.transactions = data.transactions || { EUR: [], UAH: [] };
                     state.categories = data.categories || state.categories;
                 }
                 renderGoals();
@@ -2173,9 +2333,9 @@
             }
         };
 
-        window.deleteTransaction = function(id) {
+        window.deleteTransaction = function(id, currency) {
             if (confirm('Видалити цю операцію?')) {
-                state.transactions = state.transactions.filter(t => t.id !== id);
+                state.transactions[currency] = state.transactions[currency].filter(t => t.id !== id);
                 saveToFirebase();
             }
         };
@@ -2269,13 +2429,6 @@
         });
 
         // Модалка транзакції
-        document.getElementById('addTransactionBtn').addEventListener('click', () => {
-            selectedCategory = null;
-            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('selected'));
-            updateCategoryButtons();
-            transactionModal.classList.add('active');
-        });
-
         document.getElementById('cancelTransactionBtn').addEventListener('click', () => {
             transactionModal.classList.remove('active');
             document.getElementById('transactionDesc').value = '';
@@ -2283,6 +2436,7 @@
         });
 
         document.getElementById('saveTransactionBtn').addEventListener('click', () => {
+            let currency = transactionCurrency.value;
             let type = transactionType.value;
             let desc = document.getElementById('transactionDesc').value.trim();
             let amount = parseFloat(document.getElementById('transactionAmount').value);
@@ -2297,13 +2451,14 @@
                 return;
             }
 
-            if (!state.transactions) state.transactions = [];
+            if (!state.transactions[currency]) {
+                state.transactions[currency] = [];
+            }
             
-            // Створюємо дату в вибраному місяці
             const transactionDate = new Date(currentMonth);
-            transactionDate.setDate(1); // Перше число вибраного місяця
+            transactionDate.setDate(1);
             
-            state.transactions.push({
+            state.transactions[currency].push({
                 id: genId(),
                 type: type,
                 description: desc || '-',
@@ -2355,7 +2510,7 @@
                 currentUser = null;
                 landingPage.style.display = 'block';
                 mainApp.style.display = 'none';
-                state = { goals: [], debts: { owed: [], owe: [] }, transactions: [], categories: state.categories };
+                state = { goals: [], debts: { owed: [], owe: [] }, transactions: { EUR: [], UAH: [] }, categories: state.categories };
             }
         });
     </script>
