@@ -497,6 +497,7 @@
             transition: width 0.4s;
         }
 
+        /* Історія цілей */
         .goal-history {
             margin: 20px 0;
             padding: 15px;
@@ -515,20 +516,28 @@
 
         .history-list {
             list-style: none;
-            max-height: 150px;
+            max-height: 200px;
             overflow-y: auto;
         }
 
         .history-item {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             padding: 8px 0;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             font-size: 0.9rem;
         }
 
+        .history-item-content {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
         .history-date {
             color: #8c9cc0;
+            min-width: 70px;
         }
 
         .history-plus {
@@ -539,6 +548,18 @@
         .history-minus {
             color: #ff9f9f;
             font-weight: 600;
+        }
+
+        .history-delete {
+            color: #ff9f9f;
+            cursor: pointer;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+            margin-left: 10px;
+        }
+
+        .history-delete:hover {
+            opacity: 1;
         }
 
         .goal-actions {
@@ -686,6 +707,15 @@
             border-radius: 40px;
             color: white;
             width: 100%;
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2300e6c8' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+        }
+
+        .debt-select option {
+            background: #1a1f2c;
+            color: white;
         }
 
         .debt-btn {
@@ -753,39 +783,6 @@
             color: #00e6c8;
         }
 
-        .category-btn.income i {
-            color: #6fcf97;
-        }
-
-        .category-btn.expense i {
-            color: #ff9f9f;
-        }
-
-        .add-category {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .add-category input {
-            flex: 1;
-            padding: 12px 18px;
-            background: rgba(30, 36, 48, 0.8);
-            border: 1px solid rgba(0, 230, 200, 0.15);
-            border-radius: 40px;
-            color: white;
-        }
-
-        .add-category button {
-            padding: 12px 25px;
-            background: rgba(0, 230, 200, 0.15);
-            border: 1px solid rgba(0, 230, 200, 0.3);
-            border-radius: 40px;
-            color: #00e6c8;
-            cursor: pointer;
-            font-weight: 500;
-        }
-
         /* Щоденник */
         .journal-stats {
             display: grid;
@@ -815,7 +812,6 @@
         .journal-value.income { color: #6fcf97; }
         .journal-value.expense { color: #ff9f9f; }
 
-        /* Покращені діаграми */
         .charts-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -862,6 +858,7 @@
             align-items: center;
             gap: 8px;
             font-size: 0.9rem;
+            color: #8c9cc0;
         }
 
         .legend-color {
@@ -877,38 +874,6 @@
             height: 280px;
             position: relative;
             margin-top: 10px;
-        }
-
-        /* Стилі для списку категорій */
-        .categories-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin: 15px 0;
-            padding: 15px;
-            background: rgba(30, 36, 48, 0.4);
-            border-radius: 20px;
-        }
-
-        .category-tag {
-            padding: 8px 16px;
-            background: rgba(0, 230, 200, 0.1);
-            border-radius: 30px;
-            color: #00e6c8;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .category-tag i {
-            cursor: pointer;
-            opacity: 0.5;
-            transition: opacity 0.2s;
-        }
-
-        .category-tag i:hover {
-            opacity: 1;
         }
 
         /* Транзакції */
@@ -981,7 +946,6 @@
             box-shadow: 0 15px 30px rgba(0, 230, 200, 0.3);
         }
 
-        /* Покращена таблиця */
         .transactions-table {
             width: 100%;
             border-collapse: collapse;
@@ -1611,42 +1575,73 @@
             'other': 'fa-ellipsis'
         };
 
-        // Pull-to-refresh
-        let touchStartY = 0;
+        // Pull-to-refresh (новий, без перезавантаження)
+        let startY = 0;
+        let currentY = 0;
+        let isPulling = false;
         let isRefreshing = false;
+        const threshold = 80;
 
         document.addEventListener('touchstart', (e) => {
-            if (window.scrollY === 0 && !isRefreshing) {
-                touchStartY = e.touches[0].clientY;
+            if (window.pageYOffset <= 0 && !isRefreshing) {
+                startY = e.touches[0].clientY;
+                isPulling = true;
             }
-        });
+        }, { passive: true });
 
         document.addEventListener('touchmove', (e) => {
-            if (window.scrollY === 0 && !isRefreshing && touchStartY > 0) {
-                const currentY = e.touches[0].clientY;
-                const pullDistance = currentY - touchStartY;
-                
-                if (pullDistance > 20) {
-                    refreshIndicator.classList.add('active');
-                }
-            }
-        });
+            if (!isPulling || isRefreshing) return;
 
-        document.addEventListener('touchend', (e) => {
-            if (window.scrollY === 0 && !isRefreshing && touchStartY > 0) {
-                const touchEndY = e.changedTouches[0].clientY;
-                const pullDistance = touchEndY - touchStartY;
-                
-                if (pullDistance > 50) {
-                    isRefreshing = true;
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 300);
+            currentY = e.touches[0].clientY;
+            const diff = currentY - startY;
+
+            if (diff > 0) {
+                e.preventDefault();
+
+                if (diff > threshold) {
+                    refreshIndicator.classList.add('active');
                 } else {
                     refreshIndicator.classList.remove('active');
                 }
             }
-            touchStartY = 0;
+        }, { passive: false });
+
+        document.addEventListener('touchend', async () => {
+            if (!isPulling || isRefreshing) return;
+
+            const diff = currentY - startY;
+
+            if (diff > threshold) {
+                isRefreshing = true;
+
+                if (currentUser) {
+                    await database.ref('users/' + currentUser.uid).once('value')
+                        .then(snapshot => {
+                            const data = snapshot.val();
+                            if (data) {
+                                state.goals = data.goals || [];
+                                state.debts = data.debts || { owed: [], owe: [] };
+                                state.transactions = data.transactions || [];
+                            }
+
+                            renderGoals();
+                            renderDebts();
+                            updateDebtStats();
+                            updateJournal();
+                        });
+                }
+
+                setTimeout(() => {
+                    refreshIndicator.classList.remove('active');
+                    isRefreshing = false;
+                }, 600);
+            } else {
+                refreshIndicator.classList.remove('active');
+            }
+
+            isPulling = false;
+            startY = 0;
+            currentY = 0;
         });
 
         // Навігація
@@ -1696,7 +1691,7 @@
             categories.forEach(cat => {
                 const icon = categoryIcons[cat] || 'fa-tag';
                 const name = categoryTranslations[cat] || cat;
-                html += `<button class="category-btn ${type}" data-category="${cat}">
+                html += `<button class="category-btn" data-category="${cat}">
                     <i class="fas ${icon}"></i> ${name}
                 </button>`;
             });
@@ -1773,6 +1768,25 @@
             document.getElementById('totalNet').innerHTML = (totalNet >= 0 ? '+' : '') + totalNet.toFixed(2) + ' ₴';
         }
 
+        // Видалення операції з історії цілі
+        window.deleteGoalHistory = function(goalId, historyIndex) {
+            const goal = state.goals.find(g => g.id === goalId);
+            if (goal && goal.history) {
+                const operation = goal.history[historyIndex];
+                
+                // Повертаємо суму назад
+                if (operation.type === 'add') {
+                    goal.saved -= operation.amount;
+                } else {
+                    goal.saved += operation.amount;
+                }
+                
+                // Видаляємо з історії
+                goal.history.splice(historyIndex, 1);
+                saveToFirebase();
+            }
+        };
+
         // Рендер цілей
         function renderGoals() {
             const container = document.getElementById('goalsContainer');
@@ -1786,12 +1800,15 @@
                 const p = g.target > 0 ? (g.saved / g.target) * 100 : 0;
                 
                 // Історія операцій
-                const historyHtml = (g.history || []).map(h => `
+                const historyHtml = (g.history || []).map((h, index) => `
                     <div class="history-item">
-                        <span class="history-date">${new Date(h.date).toLocaleDateString('uk-UA')}</span>
-                        <span class="${h.type === 'add' ? 'history-plus' : 'history-minus'}">
-                            ${h.type === 'add' ? '+' : '-'}${h.amount} ${s}
-                        </span>
+                        <div class="history-item-content">
+                            <span class="history-date">${new Date(h.date).toLocaleDateString('uk-UA')}</span>
+                            <span class="${h.type === 'add' ? 'history-plus' : 'history-minus'}">
+                                ${h.type === 'add' ? '+' : '-'}${h.amount} ${s}
+                            </span>
+                        </div>
+                        <i class="fas fa-times history-delete" onclick="deleteGoalHistory('${g.id}', ${index})"></i>
                     </div>
                 `).join('');
 
@@ -1898,17 +1915,20 @@
             if (monthTransactions.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#8c9cc0; padding:30px;">Немає операцій за цей місяць</td></tr>';
             } else {
-                tbody.innerHTML = monthTransactions.sort((a, b) => b.date - a.date).map(t => `
-                    <tr>
-                        <td>${new Date(t.date).toLocaleDateString('uk-UA')}</td>
+                tbody.innerHTML = monthTransactions.sort((a, b) => b.date - a.date).map(t => {
+                    const date = new Date(t.date);
+                    const monthKey = getMonthKey(date);
+                    
+                    return `<tr>
+                        <td>${date.toLocaleDateString('uk-UA')}</td>
                         <td><span class="category-badge">${categoryTranslations[t.category] || t.category}</span></td>
                         <td>${esc(t.description) || '-'}</td>
                         <td><span class="${t.type === 'income' ? 'income-text' : 'expense-text'}">
                             ${t.type === 'income' ? '+' : '-'}${t.amount.toFixed(2)} €
                         </span></td>
                         <td><i class="fas fa-trash-alt delete-btn" onclick="deleteTransaction('${t.id}')"></i></td>
-                    </tr>
-                `).join('');
+                    </tr>`;
+                }).join('');
             }
 
             // Оновлення діаграм
@@ -1969,63 +1989,110 @@
                 });
             }
 
-            // Динаміка
+            // Динаміка - групуємо по днях
             const dailyData = {};
             transactions.forEach(t => {
-                const day = new Date(t.date).toLocaleDateString('uk-UA');
-                if (!dailyData[day]) dailyData[day] = { income: 0, expense: 0 };
-                if (t.type === 'income') dailyData[day].income += t.amount;
-                else dailyData[day].expense += t.amount;
+                const date = new Date(t.date);
+                const dayKey = date.toLocaleDateString('uk-UA');
+                
+                if (!dailyData[dayKey]) {
+                    dailyData[dayKey] = { income: 0, expense: 0, date: date };
+                }
+                
+                if (t.type === 'income') {
+                    dailyData[dayKey].income += t.amount;
+                } else {
+                    dailyData[dayKey].expense += t.amount;
+                }
             });
 
-            const sortedDays = Object.keys(dailyData).sort((a, b) => new Date(a) - new Date(b));
-            
+            // Сортуємо по даті
+            const sortedDays = Object.keys(dailyData).sort((a, b) => {
+                const dateA = dailyData[a].date;
+                const dateB = dailyData[b].date;
+                return dateA - dateB;
+            });
+
             const ctx2 = document.getElementById('dynamicsChart').getContext('2d');
             if (dynamicsChart) dynamicsChart.destroy();
             
-            dynamicsChart = new Chart(ctx2, {
-                type: 'line',
-                data: {
-                    labels: sortedDays,
-                    datasets: [
-                        { 
-                            label: 'Дохід', 
-                            data: sortedDays.map(d => dailyData[d].income), 
-                            borderColor: '#6fcf97',
-                            backgroundColor: 'rgba(111, 207, 151, 0.1)',
-                            tension: 0.4,
-                            fill: true
-                        },
-                        { 
-                            label: 'Витрати', 
-                            data: sortedDays.map(d => dailyData[d].expense), 
-                            borderColor: '#ff9f9f',
-                            backgroundColor: 'rgba(255, 159, 159, 0.1)',
-                            tension: 0.4,
-                            fill: true
-                        }
-                    ]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { mode: 'index', intersect: false }
+            if (sortedDays.length === 0) {
+                dynamicsChart = new Chart(ctx2, {
+                    type: 'line',
+                    data: {
+                        labels: ['Немає даних'],
+                        datasets: [
+                            { label: 'Дохід', data: [0], borderColor: '#6fcf97', backgroundColor: 'rgba(111,207,151,0.1)' },
+                            { label: 'Витрати', data: [0], borderColor: '#ff9f9f', backgroundColor: 'rgba(255,159,159,0.1)' }
+                        ]
                     },
-                    scales: {
-                        y: { 
-                            beginAtZero: true,
-                            grid: { color: 'rgba(255,255,255,0.05)' },
-                            ticks: { color: '#8c9cc0' }
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            } else {
+                dynamicsChart = new Chart(ctx2, {
+                    type: 'line',
+                    data: {
+                        labels: sortedDays,
+                        datasets: [
+                            { 
+                                label: 'Дохід', 
+                                data: sortedDays.map(d => dailyData[d].income), 
+                                borderColor: '#6fcf97',
+                                backgroundColor: 'rgba(111, 207, 151, 0.1)',
+                                tension: 0.4,
+                                fill: true,
+                                pointBackgroundColor: '#6fcf97',
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2,
+                                pointRadius: 4
+                            },
+                            { 
+                                label: 'Витрати', 
+                                data: sortedDays.map(d => dailyData[d].expense), 
+                                borderColor: '#ff9f9f',
+                                backgroundColor: 'rgba(255, 159, 159, 0.1)',
+                                tension: 0.4,
+                                fill: true,
+                                pointBackgroundColor: '#ff9f9f',
+                                pointBorderColor: '#fff',
+                                pointBorderWidth: 2,
+                                pointRadius: 4
+                            }
+                        ]
+                    },
+                    options: { 
+                        responsive: true, 
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: { 
+                                mode: 'index', 
+                                intersect: false,
+                                backgroundColor: '#1a1f2c',
+                                titleColor: '#e0e5ff',
+                                bodyColor: '#8c9cc0',
+                                borderColor: '#00e6c8',
+                                borderWidth: 1
+                            }
                         },
-                        x: { 
-                            grid: { display: false },
-                            ticks: { color: '#8c9cc0', maxRotation: 45, minRotation: 45 }
+                        scales: {
+                            y: { 
+                                beginAtZero: true,
+                                grid: { color: 'rgba(255,255,255,0.05)' },
+                                ticks: { color: '#8c9cc0' }
+                            },
+                            x: { 
+                                grid: { display: false },
+                                ticks: { color: '#8c9cc0', maxRotation: 45, minRotation: 45 }
+                            }
                         }
                     }
-                }
-            });
+                });
+            }
         }
 
         // Firebase
@@ -2231,14 +2298,19 @@
             }
 
             if (!state.transactions) state.transactions = [];
+            
+            // Створюємо дату в вибраному місяці
+            const transactionDate = new Date(currentMonth);
+            transactionDate.setDate(1); // Перше число вибраного місяця
+            
             state.transactions.push({
                 id: genId(),
                 type: type,
                 description: desc || '-',
                 category: selectedCategory,
                 amount: amount,
-                date: Date.now(),
-                month: getMonthKey(new Date())
+                date: transactionDate.getTime(),
+                month: getMonthKey(currentMonth)
             });
 
             saveToFirebase();
