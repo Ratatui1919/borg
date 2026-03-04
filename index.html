@@ -737,7 +737,8 @@
             color: #6a7a9c;
         }
 
-        /* Виправлені стилі для селектів з прапорцями */
+        /* ========== ВИПРАВЛЕНІ ПРАПОРЦІ ========== */
+        /* Працюють на всіх пристроях */
         .debt-select {
             padding: 14px 18px;
             background: rgba(30, 36, 48, 0.8);
@@ -745,57 +746,45 @@
             border-radius: 40px;
             color: white;
             width: 100%;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2300e6c8' stroke-width='2'><polyline points='6 9 12 15 18 9'/></svg>");
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            background-size: 16px;
             font-size: 1rem;
+            cursor: pointer;
         }
 
-        /* Стилі для опцій */
+        /* Для всіх браузерів - просто текст з емодзі */
         .debt-select option {
-            background: #1a1f2c;
+            background-color: #1a1f2c;
             color: white;
             padding: 12px;
             font-size: 1rem;
         }
 
-        /* Спеціальні стилі для відображення прапорців */
+        /* Додаємо емодзі до тексту опцій */
         .debt-select option[value="UAH"] {
-            background-image: url('https://flagcdn.com/w20/ua.png');
-            background-repeat: no-repeat;
-            background-position: 10px center;
-            background-size: 20px 15px;
-            padding-left: 35px;
+            content: "🇺🇦 Гривня";
         }
 
         .debt-select option[value="EUR"] {
-            background-image: url('https://flagcdn.com/w20/eu.png');
-            background-repeat: no-repeat;
-            background-position: 10px center;
-            background-size: 20px 15px;
-            padding-left: 35px;
+            content: "🇪🇺 Євро";
         }
 
         .debt-select option[value="USD"] {
-            background-image: url('https://flagcdn.com/w20/us.png');
-            background-repeat: no-repeat;
-            background-position: 10px center;
-            background-size: 20px 15px;
-            padding-left: 35px;
+            content: "🇺🇸 Долар";
         }
 
-        /* Для Firefox */
-        @-moz-document url-prefix() {
-            .debt-select option {
-                padding-left: 35px;
-                background-position: 10px center;
-                background-repeat: no-repeat;
-                background-size: 20px 15px;
-            }
+        /* Альтернативний підхід через data атрибути */
+        .debt-select option[value="UAH"]::before {
+            content: "🇺🇦 ";
+            font-size: 1.1rem;
+        }
+
+        .debt-select option[value="EUR"]::before {
+            content: "🇪🇺 ";
+            font-size: 1.1rem;
+        }
+
+        .debt-select option[value="USD"]::before {
+            content: "🇺🇸 ";
+            font-size: 1.1rem;
         }
 
         .debt-btn {
