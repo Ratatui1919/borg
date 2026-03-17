@@ -333,10 +333,12 @@
             padding: 8px;
             border-radius: 60px;
             border: 1px solid rgba(0, 230, 200, 0.1);
+            flex-wrap: wrap;
         }
 
         .nav-tab {
             flex: 1;
+            min-width: 100px;
             padding: 14px 24px;
             border-radius: 40px;
             background: transparent;
@@ -360,6 +362,312 @@
             background: linear-gradient(135deg, rgba(0, 230, 200, 0.15), rgba(0, 153, 255, 0.15));
             color: #00e6c8;
             border: 1px solid rgba(0, 230, 200, 0.3);
+        }
+
+        /* Стилі для сторінки цілей */
+        .goals-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 35px;
+        }
+
+        .goals-stat-card {
+            background: rgba(22, 28, 40, 0.7);
+            border-radius: 28px;
+            padding: 25px;
+            border: 1px solid rgba(0, 230, 200, 0.15);
+        }
+
+        .goals-stat-title {
+            color: #8c9cc0;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .goals-stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #00e6c8;
+        }
+
+        .goals-stat-label {
+            color: #8c9cc0;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        .goals-section-title {
+            color: #e0e5ff;
+            font-size: 1.4rem;
+            margin: 40px 0 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .goals-section-title i {
+            color: #00e6c8;
+            font-size: 1.5rem;
+        }
+
+        .goals-section-title .badge {
+            background: rgba(0, 230, 200, 0.15);
+            color: #00e6c8;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+
+        .goals-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .goal-card {
+            background: rgba(22, 28, 40, 0.7);
+            border-radius: 28px;
+            padding: 25px;
+            border: 1px solid rgba(0, 230, 200, 0.15);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .goal-card.completed {
+            opacity: 0.8;
+            border-color: rgba(111, 207, 151, 0.3);
+            background: rgba(30, 36, 48, 0.6);
+        }
+
+        .goal-card.completed::before {
+            content: '✓';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 2rem;
+            color: rgba(111, 207, 151, 0.2);
+            font-weight: 800;
+        }
+
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .goal-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #e0e5ff;
+        }
+
+        .goal-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .goal-btn-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: rgba(30, 36, 48, 0.8);
+            color: #8c9cc0;
+        }
+
+        .goal-btn-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .goal-btn-icon.complete {
+            color: #6fcf97;
+        }
+
+        .goal-btn-icon.complete:hover {
+            background: rgba(111, 207, 151, 0.2);
+        }
+
+        .goal-btn-icon.delete {
+            color: #ff9f9f;
+        }
+
+        .goal-btn-icon.delete:hover {
+            background: rgba(255, 159, 159, 0.2);
+        }
+
+        .goal-btn-icon.reactivate {
+            color: #00e6c8;
+        }
+
+        .goal-btn-icon.reactivate:hover {
+            background: rgba(0, 230, 200, 0.2);
+        }
+
+        .goal-progress {
+            margin: 20px 0;
+        }
+
+        .goal-stats {
+            display: flex;
+            justify-content: space-between;
+            color: #8c9cc0;
+            margin-bottom: 10px;
+        }
+
+        .goal-amount {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #00e6c8;
+        }
+
+        .goal-amount.completed {
+            color: #6fcf97;
+        }
+
+        .progress-bar {
+            background: rgba(40, 48, 64, 0.5);
+            height: 10px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00e6c8, #0099ff);
+            border-radius: 10px;
+            transition: width 0.4s;
+        }
+
+        .progress-fill.completed {
+            background: linear-gradient(90deg, #6fcf97, #4aa96c);
+        }
+
+        .goal-history {
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(30, 36, 48, 0.4);
+            border-radius: 20px;
+        }
+
+        .history-title {
+            color: #8c9cc0;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .history-list {
+            list-style: none;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 0.9rem;
+        }
+
+        .history-item-content {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .history-date {
+            color: #8c9cc0;
+            min-width: 70px;
+        }
+
+        .history-plus {
+            color: #6fcf97;
+            font-weight: 600;
+        }
+
+        .history-minus {
+            color: #ff9f9f;
+            font-weight: 600;
+        }
+
+        .goal-input-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .goal-input-group input {
+            flex: 1;
+            padding: 12px 15px;
+            background: rgba(30, 36, 48, 0.8);
+            border: 1px solid rgba(0, 230, 200, 0.15);
+            border-radius: 40px;
+            color: white;
+            font-size: 0.95rem;
+        }
+
+        .goal-input-group input:focus {
+            outline: none;
+            border-color: #00e6c8;
+        }
+
+        .goal-small-btn {
+            padding: 12px 20px;
+            border-radius: 40px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: rgba(0, 230, 200, 0.15);
+            color: #00e6c8;
+            border: 1px solid rgba(0, 230, 200, 0.3);
+            white-space: nowrap;
+        }
+
+        .goal-small-btn:hover {
+            background: rgba(0, 230, 200, 0.25);
+        }
+
+        .empty-state {
+            grid-column: 1/-1;
+            text-align: center;
+            padding: 60px;
+            background: rgba(22, 28, 40, 0.6);
+            border-radius: 28px;
+            color: #8c9cc0;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: #00e6c8;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+            margin-bottom: 20px;
         }
 
         /* Вкладки валют */
@@ -400,7 +708,7 @@
             border: 1px solid rgba(0, 230, 200, 0.3);
         }
 
-        /* Статистика */
+        /* Статистика боргів */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -443,208 +751,6 @@
             padding: 8px 0;
             border-bottom: 1px solid rgba(0, 230, 200, 0.1);
             color: #a0b0d0;
-        }
-
-        /* Цілі */
-        .goals-section {
-            margin: 35px 0;
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .section-header h2 {
-            color: #e0e5ff;
-            font-size: 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .goals-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 20px;
-        }
-
-        .goal-card {
-            background: rgba(22, 28, 40, 0.6);
-            border-radius: 28px;
-            padding: 25px;
-            border: 1px solid rgba(0, 230, 200, 0.1);
-            position: relative;
-        }
-
-        .goal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .goal-name {
-            font-size: 1.5rem;
-            font-weight: 600;
-            color: #e0e5ff;
-        }
-
-        .goal-delete {
-            color: #ff9f9f;
-            cursor: pointer;
-            font-size: 1.2rem;
-            opacity: 0.7;
-            transition: opacity 0.2s;
-        }
-
-        .goal-delete:hover {
-            opacity: 1;
-        }
-
-        .goal-progress {
-            margin: 20px 0;
-        }
-
-        .goal-stats {
-            display: flex;
-            justify-content: space-between;
-            color: #8c9cc0;
-            margin-bottom: 10px;
-        }
-
-        .goal-amount {
-            font-size: 1.8rem;
-            font-weight: 600;
-            color: #00e6c8;
-        }
-
-        .progress-bar {
-            background: rgba(40, 48, 64, 0.5);
-            height: 10px;
-            border-radius: 10px;
-            overflow: hidden;
-            margin: 15px 0;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #00e6c8, #0099ff);
-            border-radius: 10px;
-            transition: width 0.4s;
-        }
-
-        .goal-history {
-            margin: 20px 0;
-            padding: 15px;
-            background: rgba(30, 36, 48, 0.4);
-            border-radius: 20px;
-        }
-
-        .history-title {
-            color: #8c9cc0;
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .history-list {
-            list-style: none;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .history-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 0.9rem;
-        }
-
-        .history-item-content {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .history-date {
-            color: #8c9cc0;
-            min-width: 70px;
-        }
-
-        .history-plus {
-            color: #6fcf97;
-            font-weight: 600;
-        }
-
-        .history-minus {
-            color: #ff9f9f;
-            font-weight: 600;
-        }
-
-        .history-delete {
-            color: #ff9f9f;
-            cursor: pointer;
-            opacity: 0.5;
-            transition: opacity 0.2s;
-            margin-left: 10px;
-        }
-
-        .history-delete:hover {
-            opacity: 1;
-        }
-
-        .goal-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .goal-input-group {
-            flex: 2;
-            display: flex;
-            gap: 5px;
-        }
-
-        .goal-input-group input {
-            flex: 1;
-            padding: 12px 15px;
-            background: rgba(30, 36, 48, 0.8);
-            border: 1px solid rgba(0, 230, 200, 0.15);
-            border-radius: 40px;
-            color: white;
-        }
-
-        .goal-btn {
-            padding: 12px 20px;
-            border-radius: 40px;
-            border: none;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .goal-btn.add {
-            background: rgba(0, 230, 200, 0.15);
-            color: #00e6c8;
-            border: 1px solid rgba(0, 230, 200, 0.3);
-        }
-
-        .goal-btn.withdraw {
-            background: rgba(255, 120, 140, 0.15);
-            color: #ff9f9f;
-            border: 1px solid rgba(255, 120, 140, 0.3);
         }
 
         /* Борги */
@@ -740,8 +846,6 @@
             color: #6a7a9c;
         }
 
-        /* ========== ВИПРАВЛЕНІ ПРАПОРЦІ ========== */
-        /* Працюють на всіх пристроях */
         .debt-select {
             padding: 14px 18px;
             background: rgba(30, 36, 48, 0.8);
@@ -753,41 +857,11 @@
             cursor: pointer;
         }
 
-        /* Для всіх браузерів - просто текст з емодзі */
         .debt-select option {
             background-color: #1a1f2c;
             color: white;
             padding: 12px;
             font-size: 1rem;
-        }
-
-        /* Додаємо емодзі до тексту опцій */
-        .debt-select option[value="UAH"] {
-            content: "🇺🇦 Гривня";
-        }
-
-        .debt-select option[value="EUR"] {
-            content: "🇪🇺 Євро";
-        }
-
-        .debt-select option[value="USD"] {
-            content: "🇺🇸 Долар";
-        }
-
-        /* Альтернативний підхід через data атрибути */
-        .debt-select option[value="UAH"]::before {
-            content: "🇺🇦 ";
-            font-size: 1.1rem;
-        }
-
-        .debt-select option[value="EUR"]::before {
-            content: "🇪🇺 ";
-            font-size: 1.1rem;
-        }
-
-        .debt-select option[value="USD"]::before {
-            content: "🇺🇸 ";
-            font-size: 1.1rem;
         }
 
         .debt-btn {
@@ -1086,7 +1160,7 @@
             transform: scale(1.1);
         }
 
-        /* Модалка */
+        /* Модалки */
         .modal {
             display: none;
             position: fixed;
@@ -1201,89 +1275,16 @@
                 font-size: 1.3rem;
             }
 
-            .currency-tabs {
-                margin-bottom: 20px;
-            }
-
-            .currency-tab span {
-                display: none;
-            }
-
-            .currency-tab i {
-                font-size: 1.2rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
             .goals-grid {
                 grid-template-columns: 1fr;
             }
 
-            .debts-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .goal-actions {
+            .goal-input-group {
                 flex-direction: column;
             }
 
-            .goal-input-group {
-                width: 100%;
-            }
-
-            .charts-grid {
+            .goals-stats {
                 grid-template-columns: 1fr;
-            }
-
-            .chart-container {
-                height: 220px;
-            }
-
-            .transactions-table {
-                font-size: 0.85rem;
-            }
-
-            .transactions-table th:nth-child(3),
-            .transactions-table td:nth-child(3) {
-                display: none;
-            }
-
-            .month-selector {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .btn-add {
-                width: 100%;
-                justify-content: center;
-            }
-
-            .category-buttons {
-                justify-content: center;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .logo-text {
-                font-size: 1.6rem;
-            }
-
-            .logo-badge {
-                display: none;
-            }
-
-            .stat-total {
-                font-size: 1.8rem;
-            }
-
-            .goal-amount {
-                font-size: 1.5rem;
-            }
-
-            .journal-value {
-                font-size: 1.5rem;
             }
         }
     </style>
@@ -1316,9 +1317,9 @@
                         <div class="feature-desc">Записуйте доходи та витрати, аналізуйте статистику за місяцями з наочними графіками.</div>
                     </div>
                     <div class="feature-card">
-                        <div class="feature-icon"><i class="fas fa-shield-halved"></i></div>
-                        <div class="feature-title">Повна безпека</div>
-                        <div class="feature-desc">Дані синхронізуються через Firebase. Тільки ви маєте доступ до своєї інформації.</div>
+                        <div class="feature-icon"><i class="fas fa-bullseye"></i></div>
+                        <div class="feature-title">Цілі та мрії</div>
+                        <div class="feature-desc">Створюйте фінансові цілі, відстежуйте прогрес і святкуйте досягнення.</div>
                     </div>
                 </div>
 
@@ -1359,6 +1360,10 @@
                         <i class="fas fa-hand-holding-heart"></i>
                         <span>Борги</span>
                     </button>
+                    <button class="nav-tab" id="tabGoals">
+                        <i class="fas fa-bullseye"></i>
+                        <span>Цілі</span>
+                    </button>
                     <button class="nav-tab" id="tabJournal">
                         <i class="fas fa-book-open"></i>
                         <span>Щоденник</span>
@@ -1389,17 +1394,6 @@
                             <div class="stat-item"><span>Євро:</span><span id="netEUR">0 €</span></div>
                             <div class="stat-item"><span>Долар:</span><span id="netUSD">0 $</span></div>
                         </div>
-                    </div>
-
-                    <!-- Цілі -->
-                    <div class="goals-section">
-                        <div class="section-header">
-                            <h2><i class="fas fa-crown"></i> Мої цілі</h2>
-                            <button class="btn-add" id="createGoalBtn">
-                                <i class="fas fa-plus"></i> Нова ціль
-                            </button>
-                        </div>
-                        <div class="goals-grid" id="goalsContainer"></div>
                     </div>
 
                     <!-- Борги -->
@@ -1442,6 +1436,55 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <!-- Сторінка Цілей -->
+                <div id="goalsPage" style="display: none;">
+                    <!-- Статистика -->
+                    <div class="goals-stats">
+                        <div class="goals-stat-card">
+                            <div class="goals-stat-title">
+                                <i class="fas fa-bullseye"></i> Активні цілі
+                            </div>
+                            <div class="goals-stat-value" id="activeGoalsCount">0</div>
+                            <div class="goals-stat-label">всього цілей</div>
+                        </div>
+                        <div class="goals-stat-card">
+                            <div class="goals-stat-title">
+                                <i class="fas fa-check-circle"></i> Виконані
+                            </div>
+                            <div class="goals-stat-value" id="completedGoalsCount">0</div>
+                            <div class="goals-stat-label">цілей досягнуто</div>
+                        </div>
+                        <div class="goals-stat-card">
+                            <div class="goals-stat-title">
+                                <i class="fas fa-chart-line"></i> Загальний прогрес
+                            </div>
+                            <div class="goals-stat-value" id="totalProgress">0%</div>
+                            <div class="goals-stat-label">від усіх цілей</div>
+                        </div>
+                    </div>
+
+                    <!-- Активні цілі -->
+                    <div class="section-header">
+                        <h2 class="goals-section-title">
+                            <i class="fas fa-rocket"></i> Активні цілі
+                            <span class="badge" id="activeBadge">0</span>
+                        </h2>
+                        <button class="btn-add" id="createGoalBtn">
+                            <i class="fas fa-plus"></i> Нова ціль
+                        </button>
+                    </div>
+
+                    <div class="goals-grid" id="activeGoalsContainer"></div>
+
+                    <!-- Виконані цілі -->
+                    <h2 class="goals-section-title">
+                        <i class="fas fa-trophy"></i> Досягнуті цілі
+                        <span class="badge" id="completedBadge">0</span>
+                    </h2>
+
+                    <div class="goals-grid" id="completedGoalsContainer"></div>
                 </div>
 
                 <!-- Сторінка Щоденника -->
@@ -1625,7 +1668,7 @@
     <div class="modal" id="goalModal">
         <div class="modal-content">
             <h2>🎯 Нова ціль</h2>
-            <input type="text" class="modal-input" id="goalName" placeholder="Назва цілі">
+            <input type="text" class="modal-input" id="goalName" placeholder="Назва цілі (наприклад: Новий iPhone)">
             <select class="modal-select" id="goalCurrency">
                 <option value="UAH">🇺🇦 Гривня</option>
                 <option value="EUR">🇪🇺 Євро</option>
@@ -1682,7 +1725,7 @@
 
         // Стан
         let state = {
-            goals: [],
+            goals: [], // тепер goals матиме поле completed (true/false)
             debts: { owed: [], owe: [] },
             transactions: {
                 EUR: [],
@@ -1715,8 +1758,10 @@
 
         // Навігація
         const tabDebts = document.getElementById('tabDebts');
+        const tabGoals = document.getElementById('tabGoals');
         const tabJournal = document.getElementById('tabJournal');
         const debtsPage = document.getElementById('debtsPage');
+        const goalsPage = document.getElementById('goalsPage');
         const journalPage = document.getElementById('journalPage');
 
         // Вкладки валют
@@ -1766,16 +1811,31 @@
         // Навігація
         tabDebts.addEventListener('click', () => {
             tabDebts.classList.add('active');
+            tabGoals.classList.remove('active');
             tabJournal.classList.remove('active');
             debtsPage.style.display = 'block';
+            goalsPage.style.display = 'none';
             journalPage.style.display = 'none';
+        });
+
+        tabGoals.addEventListener('click', () => {
+            tabGoals.classList.add('active');
+            tabDebts.classList.remove('active');
+            tabJournal.classList.remove('active');
+            goalsPage.style.display = 'block';
+            debtsPage.style.display = 'none';
+            journalPage.style.display = 'none';
+            renderGoals();
+            updateGoalsStats();
         });
 
         tabJournal.addEventListener('click', () => {
             tabJournal.classList.add('active');
             tabDebts.classList.remove('active');
+            tabGoals.classList.remove('active');
             journalPage.style.display = 'block';
             debtsPage.style.display = 'none';
+            goalsPage.style.display = 'none';
             updateJournal();
         });
 
@@ -1933,44 +1993,184 @@
             }
         };
 
-        // Рендер цілей
-        function renderGoals() {
-            const container = document.getElementById('goalsContainer');
-            if (!state.goals?.length) {
-                container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;background:rgba(22,28,40,0.6);border-radius:24px;color:#8c9cc0;">➕ Створіть свою першу ціль</div>';
+        // Відмітити ціль як виконану
+        window.completeGoal = function(goalId) {
+            const goal = state.goals.find(g => g.id === goalId);
+            if (goal) {
+                goal.completed = true;
+                goal.completedDate = Date.now();
+                saveToFirebase();
+            }
+        };
+
+        // Реактивувати ціль
+        window.reactivateGoal = function(goalId) {
+            const goal = state.goals.find(g => g.id === goalId);
+            if (goal) {
+                goal.completed = false;
+                delete goal.completedDate;
+                saveToFirebase();
+            }
+        };
+
+        // Додати до цілі
+        window.addToGoal = function(id) {
+            let input = document.getElementById('add-'+id);
+            let amount = parseFloat(input.value);
+            if (isNaN(amount) || amount <= 0) {
+                alert('Введіть суму');
                 return;
             }
-            let html = '';
-            state.goals.forEach(g => {
-                const s = getSymbol(g.currency);
-                const p = g.target > 0 ? (g.saved / g.target) * 100 : 0;
-                
-                const historyHtml = (g.history || []).map((h, index) => `
-                    <div class="history-item">
-                        <div class="history-item-content">
-                            <span class="history-date">${new Date(h.date).toLocaleDateString('uk-UA')}</span>
-                            <span class="${h.type === 'add' ? 'history-plus' : 'history-minus'}">
-                                ${h.type === 'add' ? '+' : '-'}${h.amount} ${s}
-                            </span>
-                        </div>
-                        <i class="fas fa-times history-delete" onclick="deleteGoalHistory('${g.id}', ${index})"></i>
-                    </div>
-                `).join('');
 
-                html += `<div class="goal-card">
-                    <div class="goal-header">
-                        <div class="goal-name">${esc(g.name)}</div>
-                        <div class="goal-delete" onclick="deleteGoal('${g.id}')"><i class="fas fa-times"></i></div>
+            let goal = state.goals.find(g => g.id === id);
+            if (goal) {
+                if (!goal.history) goal.history = [];
+                goal.history.push({
+                    type: 'add',
+                    amount: amount,
+                    date: Date.now()
+                });
+                goal.saved += amount;
+                saveToFirebase();
+            }
+            input.value = '';
+        };
+
+        // Зняти з цілі
+        window.withdrawFromGoal = function(id) {
+            let amount = parseFloat(prompt('Скільки зняти?', '0'));
+            if (isNaN(amount) || amount <= 0) return;
+
+            let goal = state.goals.find(g => g.id === id);
+            if (goal) {
+                if (amount > goal.saved) {
+                    alert('Недостатньо коштів');
+                    return;
+                }
+                if (!goal.history) goal.history = [];
+                goal.history.push({
+                    type: 'withdraw',
+                    amount: amount,
+                    date: Date.now()
+                });
+                goal.saved -= amount;
+                saveToFirebase();
+            }
+        };
+
+        // Видалити ціль
+        window.deleteGoal = function(id) {
+            if (confirm('Видалити цю ціль?')) {
+                state.goals = state.goals.filter(g => g.id !== id);
+                saveToFirebase();
+            }
+        };
+
+        // Оновлення статистики цілей
+        function updateGoalsStats() {
+            const activeGoals = state.goals.filter(g => !g.completed);
+            const completedGoals = state.goals.filter(g => g.completed);
+            
+            document.getElementById('activeGoalsCount').innerHTML = activeGoals.length;
+            document.getElementById('completedGoalsCount').innerHTML = completedGoals.length;
+            document.getElementById('activeBadge').innerHTML = activeGoals.length;
+            document.getElementById('completedBadge').innerHTML = completedGoals.length;
+
+            // Загальний прогрес
+            let totalTarget = 0;
+            let totalSaved = 0;
+            state.goals.forEach(g => {
+                totalTarget += g.target;
+                totalSaved += g.saved;
+            });
+
+            const progress = totalTarget > 0 ? Math.round((totalSaved / totalTarget) * 100) : 0;
+            document.getElementById('totalProgress').innerHTML = progress + '%';
+        }
+
+        // Рендер цілей
+        function renderGoals() {
+            const activeContainer = document.getElementById('activeGoalsContainer');
+            const completedContainer = document.getElementById('completedGoalsContainer');
+            
+            const activeGoals = state.goals.filter(g => !g.completed);
+            const completedGoals = state.goals.filter(g => g.completed);
+
+            // Рендер активних цілей
+            if (activeGoals.length === 0) {
+                activeContainer.innerHTML = `<div class="empty-state">
+                    <i class="fas fa-bullseye"></i>
+                    <p>У вас ще немає активних цілей</p>
+                    <button class="btn-add" onclick="document.getElementById('createGoalBtn').click()">
+                        <i class="fas fa-plus"></i> Створити першу ціль
+                    </button>
+                </div>`;
+            } else {
+                activeContainer.innerHTML = activeGoals.map(g => renderGoalCard(g)).join('');
+            }
+
+            // Рендер виконаних цілей
+            if (completedGoals.length === 0) {
+                completedContainer.innerHTML = `<div class="empty-state">
+                    <i class="fas fa-trophy"></i>
+                    <p>Поки немає виконаних цілей</p>
+                </div>`;
+            } else {
+                completedContainer.innerHTML = completedGoals.map(g => renderGoalCard(g, true)).join('');
+            }
+
+            updateGoalsStats();
+        }
+
+        function renderGoalCard(goal, isCompleted = false) {
+            const s = getSymbol(goal.currency);
+            const p = goal.target > 0 ? (goal.saved / goal.target) * 100 : 0;
+            
+            const historyHtml = (goal.history || []).map((h, index) => `
+                <div class="history-item">
+                    <div class="history-item-content">
+                        <span class="history-date">${new Date(h.date).toLocaleDateString('uk-UA')}</span>
+                        <span class="${h.type === 'add' ? 'history-plus' : 'history-minus'}">
+                            ${h.type === 'add' ? '+' : '-'}${h.amount} ${s}
+                        </span>
                     </div>
-                    <div class="goal-stats">
-                        <span>Накопичено: ${g.saved.toFixed(2)} ${s}</span>
-                        <span>Ціль: ${g.target.toFixed(2)} ${s}</span>
+                    <i class="fas fa-times history-delete" onclick="deleteGoalHistory('${goal.id}', ${index})"></i>
+                </div>
+            `).join('');
+
+            return `<div class="goal-card ${isCompleted ? 'completed' : ''}">
+                <div class="goal-header">
+                    <div class="goal-name">${esc(goal.name)}</div>
+                    <div class="goal-actions">
+                        ${!isCompleted ? `
+                            <button class="goal-btn-icon complete" onclick="completeGoal('${goal.id}')" title="Відмітити як виконану">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        ` : `
+                            <button class="goal-btn-icon reactivate" onclick="reactivateGoal('${goal.id}')" title="Реактивувати ціль">
+                                <i class="fas fa-undo"></i>
+                            </button>
+                        `}
+                        <button class="goal-btn-icon delete" onclick="deleteGoal('${goal.id}')" title="Видалити">
+                            <i class="fas fa-trash"></i>
+                        </button>
                     </div>
-                    <div class="goal-amount">${g.saved.toFixed(2)} ${s} / ${g.target.toFixed(2)} ${s}</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: ${Math.min(p, 100)}%"></div>
-                    </div>
-                    
+                </div>
+                
+                <div class="goal-stats">
+                    <span>Накопичено: ${goal.saved.toFixed(2)} ${s}</span>
+                    <span>Ціль: ${goal.target.toFixed(2)} ${s}</span>
+                </div>
+                
+                <div class="goal-amount ${isCompleted ? 'completed' : ''}">
+                    ${goal.saved.toFixed(2)} ${s} / ${goal.target.toFixed(2)} ${s}
+                </div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill ${isCompleted ? 'completed' : ''}" style="width: ${Math.min(p, 100)}%"></div>
+                </div>
+
+                ${!isCompleted ? `
                     <div class="goal-history">
                         <div class="history-title">
                             <i class="fas fa-history"></i> Історія операцій
@@ -1980,20 +2180,21 @@
                         </div>
                     </div>
 
-                    <div class="goal-actions">
-                        <div class="goal-input-group">
-                            <input type="number" id="add-${g.id}" placeholder="Сума">
-                            <button class="goal-btn add" onclick="addToGoal('${g.id}')">
-                                <i class="fas fa-plus"></i> Додати
-                            </button>
-                        </div>
-                        <button class="goal-btn withdraw" onclick="withdrawFromGoal('${g.id}')">
+                    <div class="goal-input-group">
+                        <input type="number" id="add-${goal.id}" placeholder="Сума для додавання">
+                        <button class="goal-small-btn" onclick="addToGoal('${goal.id}')">
+                            <i class="fas fa-plus"></i> Додати
+                        </button>
+                        <button class="goal-small-btn" onclick="withdrawFromGoal('${goal.id}')" style="background: rgba(255, 120, 140, 0.15); color: #ff9f9f;">
                             <i class="fas fa-minus"></i> Зняти
                         </button>
                     </div>
-                </div>`;
-            });
-            container.innerHTML = html;
+                ` : `
+                    <div style="margin-top: 15px; padding: 10px; background: rgba(111, 207, 151, 0.1); border-radius: 20px; text-align: center; color: #6fcf97;">
+                        <i class="fas fa-trophy"></i> Виконано: ${new Date(goal.completedDate).toLocaleDateString('uk-UA')}
+                    </div>
+                `}
+            </div>`;
         }
 
         // Рендер боргів
@@ -2092,6 +2293,14 @@
                 }).join('');
             }
         }
+
+        // Видалення транзакції
+        window.deleteTransaction = function(id, currency) {
+            if (confirm('Видалити цю операцію?')) {
+                state.transactions[currency] = state.transactions[currency].filter(t => t.id !== id);
+                saveToFirebase();
+            }
+        };
 
         // Оновлення діаграм
         function updateCharts(currency, transactions) {
@@ -2241,70 +2450,12 @@
                     state.transactions = data.transactions || { EUR: [], UAH: [] };
                     state.categories = data.categories || state.categories;
                 }
-                renderGoals();
                 renderDebts();
+                renderGoals();
                 updateDebtStats();
                 updateJournal();
             });
         }
-
-        // Глобальні функції
-        window.addToGoal = function(id) {
-            let input = document.getElementById('add-'+id);
-            let amount = parseFloat(input.value);
-            if (isNaN(amount) || amount <= 0) {
-                alert('Введіть суму');
-                return;
-            }
-
-            let goal = state.goals.find(g => g.id === id);
-            if (goal) {
-                if (!goal.history) goal.history = [];
-                goal.history.push({
-                    type: 'add',
-                    amount: amount,
-                    date: Date.now()
-                });
-                goal.saved += amount;
-                saveToFirebase();
-            }
-            input.value = '';
-        };
-
-        window.withdrawFromGoal = function(id) {
-            let amount = parseFloat(prompt('Скільки зняти?', '0'));
-            if (isNaN(amount) || amount <= 0) return;
-
-            let goal = state.goals.find(g => g.id === id);
-            if (goal) {
-                if (amount > goal.saved) {
-                    alert('Недостатньо коштів');
-                    return;
-                }
-                if (!goal.history) goal.history = [];
-                goal.history.push({
-                    type: 'withdraw',
-                    amount: amount,
-                    date: Date.now()
-                });
-                goal.saved -= amount;
-                saveToFirebase();
-            }
-        };
-
-        window.deleteGoal = function(id) {
-            if (confirm('Видалити цю ціль?')) {
-                state.goals = state.goals.filter(g => g.id !== id);
-                saveToFirebase();
-            }
-        };
-
-        window.deleteTransaction = function(id, currency) {
-            if (confirm('Видалити цю операцію?')) {
-                state.transactions[currency] = state.transactions[currency].filter(t => t.id !== id);
-                saveToFirebase();
-            }
-        };
 
         // Додавання боргів
         document.getElementById('addOwedBtn').addEventListener('click', () => {
@@ -2369,7 +2520,7 @@
         });
         
         document.getElementById('saveGoalBtn').addEventListener('click', () => {
-            let name = document.getElementById('goalName').value.trim().toUpperCase();
+            let name = document.getElementById('goalName').value.trim();
             let currency = document.getElementById('goalCurrency').value;
             let target = parseFloat(document.getElementById('goalTarget').value);
             
@@ -2385,6 +2536,7 @@
                 currency: currency, 
                 target: target, 
                 saved: 0,
+                completed: false,
                 history: []
             });
             
@@ -2482,4 +2634,3 @@
     </script>
 </body>
 </html>
-
