@@ -4,11 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     
-    <!-- Додаємо meta теги для безпеки -->
     <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
     <meta http-equiv="Cross-Origin-Embedder-Policy" content="credentialless">
     
-    <title>Balancio · фінансовий баланс</title>
+    <title>Balancio PRO · фінансовий баланс</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -27,13 +26,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
     
     <style>
-        /* ===== CSS RESET ===== */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         /* ===== CSS VARIABLES ===== */
         :root {
             --bg-primary: #0a0c10;
@@ -50,6 +42,8 @@
             --accent-secondary: #10b981;
             --accent-danger: #ef4444;
             --accent-warning: #f59e0b;
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
             
             --border-light: rgba(255, 255, 255, 0.05);
             --border-medium: rgba(255, 255, 255, 0.1);
@@ -68,6 +62,39 @@
             --transition: all 0.2s ease;
         }
 
+        /* Світла тема */
+        [data-theme="light"] {
+            --bg-primary: #f3f4f6;
+            --bg-secondary: #ffffff;
+            --bg-card: #f9fafb;
+            --bg-card-hover: #f3f4f6;
+            --bg-input: #ffffff;
+            
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --text-tertiary: #6b7280;
+            
+            --border-light: rgba(0, 0, 0, 0.05);
+            --border-medium: rgba(0, 0, 0, 0.1);
+            --border-accent: rgba(59, 130, 246, 0.3);
+            
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Кольори акцентів */
+        [data-accent="blue"] { --accent-primary: #3b82f6; }
+        [data-accent="green"] { --accent-primary: #10b981; }
+        [data-accent="purple"] { --accent-primary: #8b5cf6; }
+        [data-accent="pink"] { --accent-primary: #ec4899; }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             background: var(--bg-primary);
@@ -78,12 +105,7 @@
             justify-content: center;
             padding: 16px;
             line-height: 1.5;
-        }
-
-        /* ===== TYPOGRAPHY ===== */
-        h1, h2, h3, h4, h5, h6 {
-            font-weight: 600;
-            letter-spacing: -0.02em;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         /* ===== CONTAINER ===== */
@@ -356,16 +378,16 @@
             gap: 8px;
             margin-bottom: 32px;
             background: var(--bg-card);
-            padding: 6px;
+            padding: 8px;
             border-radius: var(--radius-full);
             border: 1px solid var(--border-medium);
             flex-wrap: wrap;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .nav-tab {
-            flex: 1;
-            min-width: 100px;
-            padding: 12px 24px;
+            padding: 10px 16px;
             border-radius: var(--radius-full);
             background: transparent;
             border: none;
@@ -377,10 +399,11 @@
             justify-content: center;
             gap: 8px;
             transition: var(--transition);
+            white-space: nowrap;
         }
 
         .nav-tab i {
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
         .nav-tab.active {
@@ -439,10 +462,6 @@
             border-bottom: 1px solid var(--border-light);
             color: var(--text-secondary);
             font-size: 0.95rem;
-        }
-
-        .stat-detail:last-child {
-            border-bottom: none;
         }
 
         /* ===== CURRENCY TABS ===== */
@@ -992,6 +1011,334 @@
             color: var(--accent-primary);
         }
 
+        /* ===== BANK ACCOUNTS ===== */
+        .bank-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .bank-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            border: 1px solid var(--border-medium);
+            transition: var(--transition);
+        }
+
+        .bank-card:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+        }
+
+        .bank-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .bank-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bank-balance {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-primary);
+            margin: 16px 0;
+        }
+
+        .bank-details {
+            display: flex;
+            gap: 16px;
+            color: var(--text-tertiary);
+            font-size: 0.9rem;
+        }
+
+        .total-balance {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-purple));
+            color: white;
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 24px;
+        }
+
+        .total-balance-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-bottom: 8px;
+        }
+
+        .total-balance-value {
+            font-size: 3rem;
+            font-weight: 700;
+        }
+
+        /* ===== BUDGET ===== */
+        .budget-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .budget-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            border: 1px solid var(--border-medium);
+        }
+
+        .budget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .budget-category {
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .budget-progress {
+            margin: 16px 0;
+        }
+
+        .budget-numbers {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+        }
+
+        .budget-progress-bar {
+            height: 8px;
+            background: var(--bg-input);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+
+        .budget-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: var(--radius-full);
+            transition: width 0.3s ease;
+        }
+
+        .budget-warning {
+            color: var(--accent-warning);
+            font-size: 0.9rem;
+            margin-top: 8px;
+        }
+
+        .budget-danger {
+            color: var(--accent-danger);
+        }
+
+        /* ===== RECURRING PAYMENTS ===== */
+        .recurring-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .recurring-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            border: 1px solid var(--border-medium);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .recurring-card:hover {
+            border-color: var(--accent-primary);
+        }
+
+        .recurring-info h4 {
+            font-size: 1.1rem;
+            margin-bottom: 4px;
+        }
+
+        .recurring-info p {
+            color: var(--text-tertiary);
+            font-size: 0.9rem;
+        }
+
+        .recurring-amount {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--accent-primary);
+        }
+
+        .recurring-badge {
+            padding: 4px 12px;
+            border-radius: var(--radius-full);
+            font-size: 0.8rem;
+            background: var(--bg-input);
+            color: var(--text-secondary);
+        }
+
+        /* ===== ANALYTICS ===== */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .analytics-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            border: 1px solid var(--border-medium);
+        }
+
+        .analytics-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .analytics-title {
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .trend-up {
+            color: var(--accent-secondary);
+        }
+
+        .trend-down {
+            color: var(--accent-danger);
+        }
+
+        /* ===== TIPS ===== */
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+        }
+
+        .tip-card {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            border: 1px solid var(--border-medium);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tip-card::before {
+            content: '💡';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 3rem;
+            opacity: 0.1;
+        }
+
+        .tip-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: var(--accent-primary);
+        }
+
+        .tip-text {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* ===== ARCHIVE ===== */
+        .archive-filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .archive-filter {
+            padding: 8px 16px;
+            border-radius: var(--radius-full);
+            background: var(--bg-input);
+            border: 1px solid var(--border-medium);
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .archive-filter.active {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+        }
+
+        .archive-item {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            margin-bottom: 12px;
+            border: 1px solid var(--border-medium);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* ===== THEME SETTINGS ===== */
+        .theme-settings {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .theme-option {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: var(--transition);
+        }
+
+        .theme-option:hover {
+            border-color: var(--accent-primary);
+        }
+
+        .theme-option.active {
+            border-color: var(--accent-primary);
+            background: rgba(59, 130, 246, 0.1);
+        }
+
+        .theme-color {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-full);
+            margin: 0 auto 12px;
+        }
+
+        .color-blue { background: #3b82f6; }
+        .color-green { background: #10b981; }
+        .color-purple { background: #8b5cf6; }
+        .color-pink { background: #ec4899; }
+
         /* ===== MODALS ===== */
         .modal {
             display: none;
@@ -1094,20 +1441,28 @@
                 padding: 20px;
             }
 
-            .landing-title {
-                font-size: 2.5rem;
-            }
-
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-
             .nav-tab span {
                 display: none;
             }
 
             .nav-tab i {
                 font-size: 1.2rem;
+            }
+
+            .nav-tab {
+                padding: 10px;
+            }
+
+            .total-balance-value {
+                font-size: 2rem;
+            }
+
+            .bank-balance {
+                font-size: 1.5rem;
+            }
+
+            .analytics-grid {
+                grid-template-columns: 1fr;
             }
 
             .goals-grid {
@@ -1159,7 +1514,7 @@
         }
     </style>
 </head>
-<body>
+<body data-theme="dark" data-accent="blue">
     <div class="refresh-indicator" id="refreshIndicator">
         <i class="fas fa-sync-alt"></i>
         <span>Оновлення даних...</span>
@@ -1172,24 +1527,39 @@
                 <div class="landing-icon">
                     <i class="fas fa-scale-balanced"></i>
                 </div>
-                <h1 class="landing-title">Balancio</h1>
-                <p class="landing-subtitle">Ваш персональний фінансовий баланс. Контролюйте борги, витрати та доходи в ідеальній гармонії.</p>
+                <h1 class="landing-title">Balancio PRO</h1>
+                <p class="landing-subtitle">Повний контроль над фінансами. Борги, цілі, бюджет, аналітика та розумні поради.</p>
                 
                 <div class="features-grid">
                     <div class="feature-card">
                         <div class="feature-icon"><i class="fas fa-hand-holding-heart"></i></div>
-                        <div class="feature-title">Облік боргів</div>
-                        <div class="feature-desc">Відстежуйте, хто вам винен і кому винні ви. Підтримка гривні, євро та долара.</div>
-                    </div>
-                    <div class="feature-card">
-                        <div class="feature-icon"><i class="fas fa-chart-simple"></i></div>
-                        <div class="feature-title">Фінансовий щоденник</div>
-                        <div class="feature-desc">Записуйте доходи та витрати, аналізуйте статистику з наочними графіками.</div>
+                        <div class="feature-title">Борги</div>
+                        <div class="feature-desc">Відстежуйте, хто вам винен і кому винні ви</div>
                     </div>
                     <div class="feature-card">
                         <div class="feature-icon"><i class="fas fa-bullseye"></i></div>
-                        <div class="feature-title">Цілі та мрії</div>
-                        <div class="feature-desc">Створюйте фінансові цілі, відстежуйте прогрес і святкуйте досягнення.</div>
+                        <div class="feature-title">Цілі</div>
+                        <div class="feature-desc">Ставте фінансові цілі та досягайте їх</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-book-open"></i></div>
+                        <div class="feature-title">Щоденник</div>
+                        <div class="feature-desc">Записуйте доходи та витрати</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-wallet"></i></div>
+                        <div class="feature-title">Мій банк</div>
+                        <div class="feature-desc">Всі рахунки в одному місці</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-chart-pie"></i></div>
+                        <div class="feature-title">Бюджет</div>
+                        <div class="feature-desc">Плануйте витрати та контролюйте їх</div>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-clock"></i></div>
+                        <div class="feature-title">Регулярні</div>
+                        <div class="feature-desc">Автоматичні платежі та підписки</div>
                     </div>
                 </div>
 
@@ -1209,9 +1579,9 @@
                         <div class="logo-icon">
                             <i class="fas fa-scale-balanced"></i>
                         </div>
-                        <span class="logo-text">Balancio</span>
+                        <span class="logo-text">Balancio PRO</span>
                         <span class="logo-badge">
-                            <i class="fas fa-shield-alt"></i> фінансовий баланс
+                            <i class="fas fa-crown"></i> premium
                         </span>
                     </div>
                     <div class="user-info">
@@ -1228,22 +1598,20 @@
 
                 <!-- Navigation -->
                 <div class="nav-tabs">
-                    <button class="nav-tab active" id="tabDebts">
-                        <i class="fas fa-hand-holding-heart"></i>
-                        <span>Борги</span>
-                    </button>
-                    <button class="nav-tab" id="tabGoals">
-                        <i class="fas fa-bullseye"></i>
-                        <span>Цілі</span>
-                    </button>
-                    <button class="nav-tab" id="tabJournal">
-                        <i class="fas fa-book-open"></i>
-                        <span>Щоденник</span>
-                    </button>
+                    <button class="nav-tab active" data-page="debts"><i class="fas fa-hand-holding-heart"></i><span>Борги</span></button>
+                    <button class="nav-tab" data-page="goals"><i class="fas fa-bullseye"></i><span>Цілі</span></button>
+                    <button class="nav-tab" data-page="journal"><i class="fas fa-book-open"></i><span>Щоденник</span></button>
+                    <button class="nav-tab" data-page="bank"><i class="fas fa-wallet"></i><span>Мій банк</span></button>
+                    <button class="nav-tab" data-page="budget"><i class="fas fa-chart-pie"></i><span>Бюджет</span></button>
+                    <button class="nav-tab" data-page="recurring"><i class="fas fa-clock"></i><span>Регулярні</span></button>
+                    <button class="nav-tab" data-page="analytics"><i class="fas fa-chart-line"></i><span>Аналітика</span></button>
+                    <button class="nav-tab" data-page="tips"><i class="fas fa-lightbulb"></i><span>Поради</span></button>
+                    <button class="nav-tab" data-page="archive"><i class="fas fa-archive"></i><span>Архів</span></button>
+                    <button class="nav-tab" data-page="themes"><i class="fas fa-palette"></i><span>Теми</span></button>
                 </div>
 
                 <!-- Debts Page -->
-                <div id="debtsPage">
+                <div id="debtsPage" class="page active">
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-title">
@@ -1322,7 +1690,7 @@
                 </div>
 
                 <!-- Goals Page -->
-                <div id="goalsPage" style="display: none;">
+                <div id="goalsPage" class="page">
                     <div class="goals-stats">
                         <div class="goal-stat-card">
                             <div class="goal-stat-title">
@@ -1365,7 +1733,7 @@
                 </div>
 
                 <!-- Journal Page -->
-                <div id="journalPage" style="display: none;">
+                <div id="journalPage" class="page">
                     <div class="journal-header">
                         <h2 class="section-title">
                             <i class="fas fa-book-open"></i> Фінансовий щоденник
@@ -1536,6 +1904,199 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Bank Page -->
+                <div id="bankPage" class="page">
+                    <div class="total-balance">
+                        <div class="total-balance-label">Загальний капітал</div>
+                        <div class="total-balance-value" id="totalBankBalance">0 €</div>
+                    </div>
+
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-wallet"></i> Мої рахунки
+                        </h2>
+                        <button class="btn btn-primary" onclick="openBankModal()">
+                            <i class="fas fa-plus"></i> Додати рахунок
+                        </button>
+                    </div>
+
+                    <div class="bank-grid" id="bankAccountsContainer">
+                        <!-- Динамічний вміст -->
+                    </div>
+                </div>
+
+                <!-- Budget Page -->
+                <div id="budgetPage" class="page">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-chart-pie"></i> Бюджет на <span id="budgetMonth"></span>
+                        </h2>
+                        <button class="btn btn-primary" onclick="openBudgetModal()">
+                            <i class="fas fa-plus"></i> Налаштувати бюджет
+                        </button>
+                    </div>
+
+                    <div class="budget-grid" id="budgetContainer">
+                        <!-- Динамічний вміст -->
+                    </div>
+                </div>
+
+                <!-- Recurring Page -->
+                <div id="recurringPage" class="page">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-clock"></i> Регулярні платежі
+                        </h2>
+                        <button class="btn btn-primary" onclick="openRecurringModal()">
+                            <i class="fas fa-plus"></i> Додати платіж
+                        </button>
+                    </div>
+
+                    <div class="recurring-grid" id="recurringContainer">
+                        <!-- Динамічний вміст -->
+                    </div>
+
+                    <div class="section-header" style="margin-top: 32px;">
+                        <h3 class="section-title">
+                            <i class="fas fa-calendar-alt"></i> Майбутні платежі
+                        </h3>
+                    </div>
+
+                    <div class="recurring-grid" id="upcomingPaymentsContainer">
+                        <!-- Динамічний вміст -->
+                    </div>
+                </div>
+
+                <!-- Analytics Page -->
+                <div id="analyticsPage" class="page">
+                    <div class="currency-tabs">
+                        <button class="currency-tab active" data-analytics-currency="EUR">
+                            <i class="fas fa-euro-sign"></i> Євро
+                        </button>
+                        <button class="currency-tab" data-analytics-currency="UAH">
+                            <i class="fas fa-hryvnia"></i> Гривня
+                        </button>
+                    </div>
+
+                    <div class="analytics-grid">
+                        <div class="analytics-card">
+                            <div class="analytics-header">
+                                <div class="analytics-title">
+                                    <i class="fas fa-chart-line"></i> Тренд витрат
+                                </div>
+                                <span class="trend-up">+12%</span>
+                            </div>
+                            <div class="chart-container" style="height: 200px;">
+                                <canvas id="trendChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="analytics-card">
+                            <div class="analytics-header">
+                                <div class="analytics-title">
+                                    <i class="fas fa-pie-chart"></i> Категорії
+                                </div>
+                            </div>
+                            <div class="chart-container" style="height: 200px;">
+                                <canvas id="categoryChart"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="analytics-card">
+                            <div class="analytics-header">
+                                <div class="analytics-title">
+                                    <i class="fas fa-trophy"></i> Топ витрат
+                                </div>
+                            </div>
+                            <div id="topExpenses"></div>
+                        </div>
+
+                        <div class="analytics-card">
+                            <div class="analytics-header">
+                                <div class="analytics-title">
+                                    <i class="fas fa-chart-bar"></i> Прогноз
+                                </div>
+                            </div>
+                            <div id="forecast"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tips Page -->
+                <div id="tipsPage" class="page">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-lightbulb"></i> Розумні поради
+                        </h2>
+                        <button class="btn btn-secondary" onclick="refreshTips()">
+                            <i class="fas fa-sync-alt"></i> Оновити
+                        </button>
+                    </div>
+
+                    <div class="tips-grid" id="tipsContainer">
+                        <!-- Динамічний вміст -->
+                    </div>
+                </div>
+
+                <!-- Archive Page -->
+                <div id="archivePage" class="page">
+                    <div class="archive-filters">
+                        <button class="archive-filter active" data-archive-type="all">Всі</button>
+                        <button class="archive-filter" data-archive-type="2026">2026</button>
+                        <button class="archive-filter" data-archive-type="2025">2025</button>
+                        <button class="archive-filter" data-archive-type="2024">2024</button>
+                    </div>
+
+                    <div id="archiveContainer">
+                        <!-- Динамічний вміст -->
+                    </div>
+                </div>
+
+                <!-- Themes Page -->
+                <div id="themesPage" class="page">
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            <i class="fas fa-palette"></i> Тема оформлення
+                        </h2>
+                    </div>
+
+                    <div class="theme-settings">
+                        <div class="theme-option active" onclick="setTheme('dark')">
+                            <i class="fas fa-moon" style="font-size: 2rem; color: var(--accent-primary);"></i>
+                            <h3>Темна</h3>
+                        </div>
+                        <div class="theme-option" onclick="setTheme('light')">
+                            <i class="fas fa-sun" style="font-size: 2rem; color: var(--accent-warning);"></i>
+                            <h3>Світла</h3>
+                        </div>
+                    </div>
+
+                    <div class="section-header" style="margin-top: 32px;">
+                        <h2 class="section-title">
+                            <i class="fas fa-paint-brush"></i> Колір акценту
+                        </h2>
+                    </div>
+
+                    <div class="theme-settings">
+                        <div class="theme-option active" onclick="setAccent('blue')">
+                            <div class="theme-color color-blue"></div>
+                            <h3>Синій</h3>
+                        </div>
+                        <div class="theme-option" onclick="setAccent('green')">
+                            <div class="theme-color color-green"></div>
+                            <h3>Зелений</h3>
+                        </div>
+                        <div class="theme-option" onclick="setAccent('purple')">
+                            <div class="theme-color color-purple"></div>
+                            <h3>Фіолетовий</h3>
+                        </div>
+                        <div class="theme-option" onclick="setAccent('pink')">
+                            <div class="theme-color color-pink"></div>
+                            <h3>Рожевий</h3>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -1592,7 +2153,6 @@
             appId: "1:361694792367:web:ccbfc861668a568e1e225a"
         };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const database = firebase.database();
@@ -1601,20 +2161,24 @@
         let state = {
             goals: [],
             debts: { owed: [], owe: [] },
-            transactions: { EUR: [], UAH: [] }
+            transactions: { EUR: [], UAH: [] },
+            bankAccounts: [],
+            budgets: {},
+            recurringPayments: []
         };
+
         let currentUser = null;
         let currentMonth = new Date();
         let currentCurrency = 'EUR';
         let selectedCategory = null;
         
-        // Charts instances
+        // Charts
         let eurExpensesChart = null;
         let eurDynamicsChart = null;
         let uahExpensesChart = null;
         let uahDynamicsChart = null;
 
-        // ========== DOM ELEMENTS ==========
+        // ========== DOM Elements ==========
         const landingPage = document.getElementById('landingPage');
         const mainApp = document.getElementById('mainApp');
         const landingLoginBtn = document.getElementById('landingLoginBtn');
@@ -1623,12 +2187,11 @@
         const refreshIndicator = document.getElementById('refreshIndicator');
 
         // Navigation
+        const navTabs = document.querySelectorAll('.nav-tab');
+        const pages = document.querySelectorAll('.page');
         const tabDebts = document.getElementById('tabDebts');
         const tabGoals = document.getElementById('tabGoals');
         const tabJournal = document.getElementById('tabJournal');
-        const debtsPage = document.getElementById('debtsPage');
-        const goalsPage = document.getElementById('goalsPage');
-        const journalPage = document.getElementById('journalPage');
 
         // Currency tabs
         const eurContent = document.getElementById('eurContent');
@@ -1642,7 +2205,7 @@
         const transactionType = document.getElementById('transactionType');
         const categoryButtons = document.getElementById('categoryButtons');
 
-        // ========== CONSTANTS ==========
+        // Categories
         const categoryTranslations = {
             'salary': 'Зарплата',
             'gift': 'Подарунок',
@@ -1673,6 +2236,76 @@
             'other': 'fa-ellipsis'
         };
 
+        // ========== NAVIGATION ==========
+        navTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const pageId = tab.dataset.page;
+                
+                navTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                pages.forEach(p => p.classList.remove('active'));
+                document.getElementById(pageId + 'Page')?.classList.add('active');
+                
+                updatePageContent(pageId);
+            });
+        });
+
+        // Currency tabs
+        currencyTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                currencyTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentCurrency = tab.dataset.currency;
+                eurContent.style.display = currentCurrency === 'EUR' ? 'block' : 'none';
+                uahContent.style.display = currentCurrency === 'UAH' ? 'block' : 'none';
+            });
+        });
+
+        // Month navigation
+        document.getElementById('prevMonth')?.addEventListener('click', () => {
+            currentMonth.setMonth(currentMonth.getMonth() - 1);
+            updateMonthDisplay();
+            updateJournal();
+        });
+
+        document.getElementById('nextMonth')?.addEventListener('click', () => {
+            currentMonth.setMonth(currentMonth.getMonth() + 1);
+            updateMonthDisplay();
+            updateJournal();
+        });
+
+        // ========== THEME FUNCTIONS ==========
+        window.setTheme = (theme) => {
+            document.body.setAttribute('data-theme', theme);
+            localStorage.setItem('balancio-theme', theme);
+            
+            document.querySelectorAll('[onclick^="setTheme"]').forEach(el => {
+                el.classList.remove('active');
+                if (el.getAttribute('onclick')?.includes(theme)) {
+                    el.classList.add('active');
+                }
+            });
+        };
+
+        window.setAccent = (color) => {
+            document.body.setAttribute('data-accent', color);
+            localStorage.setItem('balancio-accent', color);
+            
+            document.querySelectorAll('[onclick^="setAccent"]').forEach(el => {
+                el.classList.remove('active');
+                if (el.getAttribute('onclick')?.includes(color)) {
+                    el.classList.add('active');
+                }
+            });
+        };
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('balancio-theme');
+        const savedAccent = localStorage.getItem('balancio-accent');
+        if (savedTheme) setTheme(savedTheme);
+        if (savedAccent) setAccent(savedAccent);
+
         // ========== HELPER FUNCTIONS ==========
         const getSymbol = (currency) => {
             const symbols = { UAH: '₴', EUR: '€', USD: '$' };
@@ -1697,7 +2330,21 @@
             setTimeout(() => refreshIndicator.classList.remove('active'), 1000);
         };
 
-        // ========== CATEGORY BUTTONS ==========
+        const updateMonthDisplay = () => {
+            document.getElementById('currentMonth').innerHTML = 
+                currentMonth.toLocaleDateString('uk-UA', { month: 'long', year: 'numeric' });
+        };
+
+        // ========== TRANSACTION MODAL ==========
+        window.openTransactionModal = (currency) => {
+            selectedCategory = null;
+            transactionCurrency.value = currency;
+            updateCategoryButtons();
+            transactionModal.classList.add('active');
+        };
+
+        transactionType.addEventListener('change', updateCategoryButtons);
+
         const updateCategoryButtons = () => {
             const type = transactionType.value;
             const categories = type === 'income' 
@@ -1718,111 +2365,6 @@
                 });
             });
         };
-
-        // ========== DATA MIGRATION ==========
-        const migrateOldData = (data) => {
-            // Якщо це старі дані без поля completed в цілях
-            if (data.goals && Array.isArray(data.goals)) {
-                data.goals = data.goals.map(goal => {
-                    if (goal.completed === undefined) {
-                        // Якщо ціль була виконана (saved >= target), відмічаємо як виконану
-                        const completed = goal.saved >= goal.target;
-                        return {
-                            ...goal,
-                            completed: completed,
-                            completedDate: completed ? Date.now() : null,
-                            history: goal.history || []
-                        };
-                    }
-                    return goal;
-                });
-            }
-            
-            // Забезпечуємо правильну структуру транзакцій
-            if (!data.transactions) {
-                data.transactions = { EUR: [], UAH: [] };
-            } else if (!data.transactions.EUR) {
-                data.transactions.EUR = [];
-            } else if (!data.transactions.UAH) {
-                data.transactions.UAH = [];
-            }
-            
-            // Забезпечуємо правильну структуру боргів
-            if (!data.debts) {
-                data.debts = { owed: [], owe: [] };
-            } else {
-                if (!data.debts.owed) data.debts.owed = [];
-                if (!data.debts.owe) data.debts.owe = [];
-            }
-            
-            return data;
-        };
-
-        // ========== NAVIGATION ==========
-        tabDebts.addEventListener('click', () => {
-            [tabDebts, tabGoals, tabJournal].forEach(t => t.classList.remove('active'));
-            tabDebts.classList.add('active');
-            debtsPage.style.display = 'block';
-            goalsPage.style.display = 'none';
-            journalPage.style.display = 'none';
-        });
-
-        tabGoals.addEventListener('click', () => {
-            [tabDebts, tabGoals, tabJournal].forEach(t => t.classList.remove('active'));
-            tabGoals.classList.add('active');
-            goalsPage.style.display = 'block';
-            debtsPage.style.display = 'none';
-            journalPage.style.display = 'none';
-            renderGoals();
-        });
-
-        tabJournal.addEventListener('click', () => {
-            [tabDebts, tabGoals, tabJournal].forEach(t => t.classList.remove('active'));
-            tabJournal.classList.add('active');
-            journalPage.style.display = 'block';
-            debtsPage.style.display = 'none';
-            goalsPage.style.display = 'none';
-            updateJournal();
-        });
-
-        // ========== CURRENCY TABS ==========
-        currencyTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                currencyTabs.forEach(t => t.classList.remove('active'));
-                tab.classList.add('active');
-                currentCurrency = tab.dataset.currency;
-                eurContent.style.display = currentCurrency === 'EUR' ? 'block' : 'none';
-                uahContent.style.display = currentCurrency === 'UAH' ? 'block' : 'none';
-            });
-        });
-
-        // ========== MONTH NAVIGATION ==========
-        document.getElementById('prevMonth').addEventListener('click', () => {
-            currentMonth.setMonth(currentMonth.getMonth() - 1);
-            updateMonthDisplay();
-            updateJournal();
-        });
-
-        document.getElementById('nextMonth').addEventListener('click', () => {
-            currentMonth.setMonth(currentMonth.getMonth() + 1);
-            updateMonthDisplay();
-            updateJournal();
-        });
-
-        const updateMonthDisplay = () => {
-            document.getElementById('currentMonth').innerHTML = 
-                currentMonth.toLocaleDateString('uk-UA', { month: 'long', year: 'numeric' });
-        };
-
-        // ========== TRANSACTION MODAL ==========
-        window.openTransactionModal = (currency) => {
-            selectedCategory = null;
-            transactionCurrency.value = currency;
-            updateCategoryButtons();
-            transactionModal.classList.add('active');
-        };
-
-        transactionType.addEventListener('change', updateCategoryButtons);
 
         // ========== DEBT FUNCTIONS ==========
         const updateDebtStats = () => {
@@ -2097,16 +2639,15 @@
         };
 
         const updateCharts = (currency, transactions) => {
-            // Expenses by category
+            const ctx1 = document.getElementById(currency + 'ExpensesChart')?.getContext('2d');
+            if (!ctx1) return;
+            
             const expensesByCategory = {};
             (transactions || []).filter(t => t.type === 'expense').forEach(t => {
                 const cat = categoryTranslations[t.category] || t.category;
                 expensesByCategory[cat] = (expensesByCategory[cat] || 0) + (t.amount || 0);
             });
 
-            const ctx1 = document.getElementById(currency + 'ExpensesChart')?.getContext('2d');
-            if (!ctx1) return;
-            
             if (currency === 'eur' && eurExpensesChart) eurExpensesChart.destroy();
             if (currency === 'uah' && uahExpensesChart) uahExpensesChart.destroy();
             
@@ -2132,7 +2673,6 @@
             if (currency === 'eur') eurExpensesChart = chart1;
             else uahExpensesChart = chart1;
 
-            // Daily dynamics
             const dailyData = {};
             (transactions || []).forEach(t => {
                 if (!t.date) return;
@@ -2189,6 +2729,291 @@
             else uahDynamicsChart = chart2;
         };
 
+        // ========== BANK FUNCTIONS ==========
+        window.openBankModal = () => {
+            const name = prompt('Назва рахунку (наприклад: Готівка, Monobank)');
+            if (!name) return;
+            
+            const currency = prompt('Валюта (EUR/UAH/USD)', 'EUR');
+            if (!['EUR', 'UAH', 'USD'].includes(currency)) return;
+            
+            const balance = parseFloat(prompt('Поточний баланс', '0'));
+            if (isNaN(balance)) return;
+            
+            state.bankAccounts = state.bankAccounts || [];
+            state.bankAccounts.push({
+                id: genId(),
+                name,
+                currency,
+                balance,
+                icon: getRandomBankIcon()
+            });
+            
+            saveToFirebase();
+        };
+
+        const getRandomBankIcon = () => {
+            const icons = ['fa-building', 'fa-credit-card', 'fa-wallet', 'fa-piggy-bank', 'fa-coins'];
+            return icons[Math.floor(Math.random() * icons.length)];
+        };
+
+        const renderBankAccounts = () => {
+            const container = document.getElementById('bankAccountsContainer');
+            if (!container) return;
+            
+            if (!state.bankAccounts?.length) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-wallet"></i><p>Додайте свій перший рахунок</p></div>';
+                return;
+            }
+            
+            container.innerHTML = state.bankAccounts.map(acc => `
+                <div class="bank-card">
+                    <div class="bank-header">
+                        <div class="bank-name">
+                            <i class="fas ${acc.icon}"></i> ${acc.name}
+                        </div>
+                        <button class="btn-icon" onclick="deleteBankAccount('${acc.id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                    <div class="bank-balance">${acc.balance.toFixed(2)} ${getSymbol(acc.currency)}</div>
+                    <div class="bank-details">
+                        <span><i class="fas fa-credit-card"></i> ${acc.currency}</span>
+                    </div>
+                </div>
+            `).join('');
+            
+            updateTotalBalance();
+        };
+
+        const updateTotalBalance = () => {
+            const total = state.bankAccounts?.reduce((sum, acc) => sum + acc.balance, 0) || 0;
+            document.getElementById('totalBankBalance').innerHTML = total.toFixed(2) + ' €';
+        };
+
+        window.deleteBankAccount = (id) => {
+            if (confirm('Видалити цей рахунок?')) {
+                state.bankAccounts = state.bankAccounts.filter(acc => acc.id !== id);
+                saveToFirebase();
+            }
+        };
+
+        // ========== BUDGET FUNCTIONS ==========
+        window.openBudgetModal = () => {
+            alert('Функція налаштування бюджету буде доступна найближчим часом!');
+        };
+
+        const renderBudget = () => {
+            const container = document.getElementById('budgetContainer');
+            if (!container) return;
+            
+            const monthKey = getMonthKey(currentMonth);
+            document.getElementById('budgetMonth').innerHTML = 
+                currentMonth.toLocaleDateString('uk-UA', { month: 'long' });
+            
+            const sampleBudget = [
+                { category: 'food', name: 'Їжа', planned: 400, spent: 320, icon: 'fa-utensils' },
+                { category: 'transport', name: 'Транспорт', planned: 80, spent: 45, icon: 'fa-bus' },
+                { category: 'entertainment', name: 'Розваги', planned: 150, spent: 180, icon: 'fa-film' },
+                { category: 'health', name: 'Здоров\'я', planned: 100, spent: 35, icon: 'fa-heartbeat' }
+            ];
+            
+            container.innerHTML = sampleBudget.map(item => {
+                const percent = (item.spent / item.planned) * 100;
+                const status = percent > 100 ? 'budget-danger' : percent > 80 ? 'budget-warning' : '';
+                
+                return `
+                    <div class="budget-card">
+                        <div class="budget-header">
+                            <div class="budget-category">
+                                <i class="fas ${item.icon}"></i> ${item.name}
+                            </div>
+                            <span class="${status}">${percent.toFixed(0)}%</span>
+                        </div>
+                        <div class="budget-progress">
+                            <div class="budget-numbers">
+                                <span>Витрачено: ${item.spent} €</span>
+                                <span>План: ${item.planned} €</span>
+                            </div>
+                            <div class="budget-progress-bar">
+                                <div class="budget-progress-fill" style="width: ${Math.min(percent, 100)}%"></div>
+                            </div>
+                            ${percent > 100 ? 
+                                `<div class="budget-warning">Перевищення на ${(percent - 100).toFixed(0)}%</div>` : 
+                                percent > 80 ? 
+                                `<div class="budget-warning">Залишилось ${(item.planned - item.spent).toFixed(2)} €</div>` : ''
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        };
+
+        // ========== RECURRING FUNCTIONS ==========
+        window.openRecurringModal = () => {
+            alert('Функція додавання регулярних платежів буде доступна найближчим часом!');
+        };
+
+        const renderRecurring = () => {
+            const container = document.getElementById('recurringContainer');
+            const upcomingContainer = document.getElementById('upcomingPaymentsContainer');
+            
+            if (!container || !upcomingContainer) return;
+            
+            const sampleRecurring = [
+                { name: 'Оренда', amount: 500, currency: 'EUR', frequency: 'Щомісяця', day: 5, category: 'Житло' },
+                { name: 'Інтернет', amount: 25, currency: 'EUR', frequency: 'Щомісяця', day: 10, category: 'Зв\'язок' },
+                { name: 'Spotify', amount: 10, currency: 'EUR', frequency: 'Щомісяця', day: 15, category: 'Підписки' },
+                { name: 'Страхування', amount: 200, currency: 'EUR', frequency: 'Щороку', day: '01.03', category: 'Страхування' }
+            ];
+            
+            container.innerHTML = sampleRecurring.map(p => `
+                <div class="recurring-card">
+                    <div class="recurring-info">
+                        <h4>${p.name}</h4>
+                        <p>${p.frequency}, ${p.day} число • ${p.category}</p>
+                    </div>
+                    <div class="recurring-amount">${p.amount} ${getSymbol(p.currency)}</div>
+                </div>
+            `).join('');
+            
+            upcomingContainer.innerHTML = sampleRecurring.slice(0, 2).map(p => `
+                <div class="recurring-card">
+                    <div class="recurring-info">
+                        <h4>${p.name}</h4>
+                        <p>Через ${Math.floor(Math.random() * 5) + 1} днів</p>
+                    </div>
+                    <div class="recurring-amount">${p.amount} ${getSymbol(p.currency)}</div>
+                </div>
+            `).join('');
+        };
+
+        // ========== ANALYTICS FUNCTIONS ==========
+        const updateAnalytics = () => {
+            console.log('Аналітика оновлена');
+        };
+
+        // ========== TIPS FUNCTIONS ==========
+        window.refreshTips = () => {
+            renderTips();
+        };
+
+        const renderTips = () => {
+            const container = document.getElementById('tipsContainer');
+            if (!container) return;
+            
+            const tips = [
+                {
+                    title: 'Правило 50/30/20',
+                    text: '50% доходу на потреби, 30% на бажання, 20% на заощадження. Це допоможе збалансувати бюджет.'
+                },
+                {
+                    title: 'Економія на підписках',
+                    text: 'Перевірте регулярні платежі - можливо, ви платите за сервіси, якими не користуєтесь.'
+                },
+                {
+                    title: 'Фінансова подушка',
+                    text: 'Рекомендується мати запас у розмірі 3-6 місячних витрат на непередбачені ситуації.'
+                },
+                {
+                    title: 'Інвестиції для початківців',
+                    text: 'Почніть з малого - регулярно інвестуйте навіть невеликі суми, використовуючи DCA стратегію.'
+                }
+            ];
+            
+            container.innerHTML = tips.map(tip => `
+                <div class="tip-card">
+                    <div class="tip-title">${tip.title}</div>
+                    <div class="tip-text">${tip.text}</div>
+                </div>
+            `).join('');
+        };
+
+        // ========== ARCHIVE FUNCTIONS ==========
+        const renderArchive = () => {
+            const container = document.getElementById('archiveContainer');
+            if (!container) return;
+            
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-archive"></i>
+                    <p>Тут будуть ваші архівні транзакції</p>
+                </div>
+            `;
+        };
+
+        // ========== PAGE CONTENT UPDATE ==========
+        const updatePageContent = (pageId) => {
+            switch(pageId) {
+                case 'debts':
+                    renderDebts();
+                    updateDebtStats();
+                    break;
+                case 'goals':
+                    renderGoals();
+                    break;
+                case 'journal':
+                    updateJournal();
+                    break;
+                case 'bank':
+                    renderBankAccounts();
+                    break;
+                case 'budget':
+                    renderBudget();
+                    break;
+                case 'recurring':
+                    renderRecurring();
+                    break;
+                case 'analytics':
+                    updateAnalytics();
+                    break;
+                case 'tips':
+                    renderTips();
+                    break;
+                case 'archive':
+                    renderArchive();
+                    break;
+            }
+        };
+
+        // ========== DATA MIGRATION ==========
+        const migrateOldData = (data) => {
+            if (data.goals && Array.isArray(data.goals)) {
+                data.goals = data.goals.map(goal => {
+                    if (goal.completed === undefined) {
+                        const completed = goal.saved >= goal.target;
+                        return {
+                            ...goal,
+                            completed: completed,
+                            completedDate: completed ? Date.now() : null,
+                            history: goal.history || []
+                        };
+                    }
+                    return goal;
+                });
+            }
+            
+            if (!data.transactions) {
+                data.transactions = { EUR: [], UAH: [] };
+            } else {
+                if (!data.transactions.EUR) data.transactions.EUR = [];
+                if (!data.transactions.UAH) data.transactions.UAH = [];
+            }
+            
+            if (!data.debts) {
+                data.debts = { owed: [], owe: [] };
+            } else {
+                if (!data.debts.owed) data.debts.owed = [];
+                if (!data.debts.owe) data.debts.owe = [];
+            }
+            
+            data.bankAccounts = data.bankAccounts || [];
+            data.budgets = data.budgets || {};
+            data.recurringPayments = data.recurringPayments || [];
+            
+            return data;
+        };
+
         // ========== FIREBASE FUNCTIONS ==========
         const saveToFirebase = () => {
             if (!currentUser) return;
@@ -2201,32 +3026,33 @@
             database.ref('users/' + uid).on('value', (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
-                    // Міграція старих даних
                     const migratedData = migrateOldData(data);
                     state = {
                         goals: migratedData.goals || [],
                         debts: migratedData.debts || { owed: [], owe: [] },
-                        transactions: migratedData.transactions || { EUR: [], UAH: [] }
-                    };
-                } else {
-                    // Новий користувач - створюємо порожній стан
-                    state = {
-                        goals: [],
-                        debts: { owed: [], owe: [] },
-                        transactions: { EUR: [], UAH: [] }
+                        transactions: migratedData.transactions || { EUR: [], UAH: [] },
+                        bankAccounts: migratedData.bankAccounts || [],
+                        budgets: migratedData.budgets || {},
+                        recurringPayments: migratedData.recurringPayments || []
                     };
                 }
-                renderDebts();
-                renderGoals();
-                updateDebtStats();
-                updateJournal();
+                
+                updatePageContent('debts');
+                updatePageContent('goals');
+                updatePageContent('journal');
+                updatePageContent('bank');
+                updatePageContent('budget');
+                updatePageContent('recurring');
+                updatePageContent('tips');
+                updatePageContent('archive');
+                
             }, (error) => {
                 console.error('Firebase load error:', error);
             });
         };
 
         // ========== EVENT LISTENERS ==========
-        document.getElementById('addOwedBtn').addEventListener('click', () => {
+        document.getElementById('addOwedBtn')?.addEventListener('click', () => {
             const name = document.getElementById('owedName').value.trim();
             const amount = parseFloat(document.getElementById('owedAmount').value);
             const currency = document.getElementById('owedCurrency').value;
@@ -2241,7 +3067,7 @@
             ['owedName', 'owedAmount', 'owedDesc'].forEach(id => document.getElementById(id).value = '');
         });
 
-        document.getElementById('addOweBtn').addEventListener('click', () => {
+        document.getElementById('addOweBtn')?.addEventListener('click', () => {
             const name = document.getElementById('oweName').value.trim();
             const amount = parseFloat(document.getElementById('oweAmount').value);
             const currency = document.getElementById('oweCurrency').value;
@@ -2256,15 +3082,15 @@
             ['oweName', 'oweAmount', 'oweDesc'].forEach(id => document.getElementById(id).value = '');
         });
 
-        document.getElementById('createGoalBtn').addEventListener('click', () => goalModal.classList.add('active'));
+        document.getElementById('createGoalBtn')?.addEventListener('click', () => goalModal.classList.add('active'));
         
-        document.getElementById('cancelGoalBtn').addEventListener('click', () => {
+        document.getElementById('cancelGoalBtn')?.addEventListener('click', () => {
             goalModal.classList.remove('active');
             document.getElementById('goalName').value = '';
             document.getElementById('goalTarget').value = '';
         });
 
-        document.getElementById('saveGoalBtn').addEventListener('click', () => {
+        document.getElementById('saveGoalBtn')?.addEventListener('click', () => {
             const name = document.getElementById('goalName').value.trim();
             const currency = document.getElementById('goalCurrency').value;
             const target = parseFloat(document.getElementById('goalTarget').value);
@@ -2288,13 +3114,13 @@
             document.getElementById('goalTarget').value = '';
         });
 
-        document.getElementById('cancelTransactionBtn').addEventListener('click', () => {
+        document.getElementById('cancelTransactionBtn')?.addEventListener('click', () => {
             transactionModal.classList.remove('active');
             document.getElementById('transactionDesc').value = '';
             document.getElementById('transactionAmount').value = '';
         });
 
-        document.getElementById('saveTransactionBtn').addEventListener('click', () => {
+        document.getElementById('saveTransactionBtn')?.addEventListener('click', () => {
             const currency = transactionCurrency.value;
             const type = transactionType.value;
             const desc = document.getElementById('transactionDesc').value.trim();
@@ -2320,9 +3146,8 @@
             document.getElementById('transactionAmount').value = '';
         });
 
-        // Close modals on background click
         [goalModal, transactionModal].forEach(modal => {
-            modal.addEventListener('click', (e) => {
+            modal?.addEventListener('click', (e) => {
                 if (e.target === modal) modal.classList.remove('active');
             });
         });
@@ -2347,7 +3172,6 @@
                 currentUser = null;
                 landingPage.style.display = 'block';
                 mainApp.style.display = 'none';
-                state = { goals: [], debts: { owed: [], owe: [] }, transactions: { EUR: [], UAH: [] } };
             }
         });
     </script>
