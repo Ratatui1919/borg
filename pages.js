@@ -65,6 +65,12 @@ const DebtsPage = {
     render() {
         const data = AppState.data.debts;
         const html = `
+            <div class="page-header">
+                <h2 class="page-title">
+                    <i class="fas fa-hand-holding-heart"></i> Борги
+                </h2>
+            </div>
+
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-title"><i class="fas fa-arrow-down"></i> Мені винені</div>
@@ -239,6 +245,12 @@ const GoalsPage = {
         const completedGoals = AppState.data.goals.filter(g => g.completed);
         
         const html = `
+            <div class="page-header">
+                <h2 class="page-title">
+                    <i class="fas fa-bullseye"></i> Цілі
+                </h2>
+            </div>
+
             <div class="goals-stats">
                 <div class="goal-stat-card">
                     <div class="goal-stat-title"><i class="fas fa-bullseye"></i> Активні цілі</div>
@@ -255,10 +267,10 @@ const GoalsPage = {
             </div>
 
             <div class="section-header">
-                <h2 class="page-title">
+                <h3 class="page-title" style="font-size: 1.3rem;">
                     <i class="fas fa-rocket"></i> Активні цілі
                     <span class="section-badge">${activeGoals.length}</span>
-                </h2>
+                </h3>
                 <button class="btn btn-primary" onclick="Modals.openGoalModal()">
                     <i class="fas fa-plus"></i> Нова ціль
                 </button>
@@ -268,10 +280,10 @@ const GoalsPage = {
                 ${this.renderGoalsList(activeGoals)}
             </div>
 
-            <h2 class="page-title">
+            <h3 class="page-title" style="font-size: 1.3rem; margin-top: 30px;">
                 <i class="fas fa-trophy"></i> Досягнуті цілі
                 <span class="section-badge">${completedGoals.length}</span>
-            </h2>
+            </h3>
 
             <div class="goals-grid">
                 ${this.renderGoalsList(completedGoals, true)}
@@ -732,15 +744,21 @@ const BankPage = {
         const total = accounts.reduce((sum, acc) => sum + (acc.balance || 0), 0);
         
         const html = `
+            <div class="page-header">
+                <h2 class="page-title">
+                    <i class="fas fa-wallet"></i> Мій банк
+                </h2>
+            </div>
+
             <div class="total-balance">
                 <div class="total-balance-label">Загальний капітал</div>
                 <div class="total-balance-value">${total.toFixed(2)} €</div>
             </div>
 
-            <div class="page-header">
-                <h2 class="page-title">
+            <div class="page-header" style="margin-top: 20px;">
+                <h3 class="page-title" style="font-size: 1.2rem;">
                     <i class="fas fa-wallet"></i> Мої рахунки
-                </h2>
+                </h3>
                 <button class="btn btn-primary" onclick="Modals.openBankModal()">
                     <i class="fas fa-plus"></i> Додати рахунок
                 </button>
@@ -811,7 +829,7 @@ const BudgetPage = {
         const html = `
             <div class="page-header">
                 <h2 class="page-title">
-                    <i class="fas fa-chart-pie"></i> Бюджет на ${monthName}
+                    <i class="fas fa-chart-pie"></i> Бюджет
                 </h2>
                 <button class="btn btn-primary" onclick="BudgetPage.editBudget()">
                     <i class="fas fa-edit"></i> Редагувати
@@ -834,6 +852,10 @@ const BudgetPage = {
                     </div>
                 </div>
             </div>
+
+            <h3 class="page-title" style="font-size: 1.2rem; margin: 20px 0;">
+                <i class="fas fa-chart-line"></i> Бюджет на ${monthName}
+            </h3>
 
             <div class="budget-grid">
                 ${this.renderBudgetItems(budgetData)}
@@ -974,7 +996,7 @@ const BudgetPage = {
     }
 };
 
-// ========== RECURRING PAGE (ВИПРАВЛЕНА) ==========
+// ========== RECURRING PAGE ==========
 const RecurringPage = {
     render() {
         const payments = AppState.data.recurringPayments || [];
@@ -993,9 +1015,9 @@ const RecurringPage = {
                 ${this.renderPayments(payments)}
             </div>
 
-            <h2 class="page-title" style="font-size: 1.2rem; margin-top: 32px;">
+            <h3 class="page-title" style="font-size: 1.2rem; margin-top: 30px;">
                 <i class="fas fa-calendar-alt"></i> Майбутні платежі
-            </h2>
+            </h3>
 
             <div class="recurring-grid" id="upcomingPayments">
                 ${this.renderUpcoming(payments)}
@@ -1108,7 +1130,7 @@ const RecurringPage = {
     }
 };
 
-// ========== ANALYTICS PAGE (ВИПРАВЛЕНА) ==========
+// ========== ANALYTICS PAGE ==========
 const AnalyticsPage = {
     charts: {
         pie: null,
@@ -1529,45 +1551,27 @@ const ThemesPage = {
         const html = `
             <div class="page-header">
                 <h2 class="page-title">
-                    <i class="fas fa-palette"></i> Тема оформлення
+                    <i class="fas fa-palette"></i> Теми оформлення
                 </h2>
             </div>
 
-            <h3 class="page-title" style="font-size: 1.2rem; margin-bottom: 16px;">
-                <i class="fas fa-moon"></i> Режим
-            </h3>
+            <div class="themes-container">
+                <div class="theme-section">
+                    <h3 class="theme-section-title">
+                        <i class="fas fa-moon"></i> Темний режим
+                    </h3>
+                    <div class="theme-grid">
+                        ${this.renderThemeOptions('dark', currentTheme, currentAccent)}
+                    </div>
+                </div>
 
-            <div class="theme-settings">
-                <div class="theme-option ${currentTheme === 'dark' ? 'active' : ''}" onclick="ThemesPage.setTheme('dark')">
-                    <i class="fas fa-moon" style="font-size: 2rem;"></i>
-                    <h3>Темна</h3>
-                </div>
-                <div class="theme-option ${currentTheme === 'light' ? 'active' : ''}" onclick="ThemesPage.setTheme('light')">
-                    <i class="fas fa-sun" style="font-size: 2rem;"></i>
-                    <h3>Світла</h3>
-                </div>
-            </div>
-
-            <h3 class="page-title" style="font-size: 1.2rem; margin: 32px 0 16px;">
-                <i class="fas fa-paint-brush"></i> Колір акценту
-            </h3>
-
-            <div class="theme-settings">
-                <div class="theme-option ${currentAccent === 'blue' ? 'active' : ''}" onclick="ThemesPage.setAccent('blue')">
-                    <div class="theme-color color-blue"></div>
-                    <h3>Синій</h3>
-                </div>
-                <div class="theme-option ${currentAccent === 'green' ? 'active' : ''}" onclick="ThemesPage.setAccent('green')">
-                    <div class="theme-color color-green"></div>
-                    <h3>Зелений</h3>
-                </div>
-                <div class="theme-option ${currentAccent === 'purple' ? 'active' : ''}" onclick="ThemesPage.setAccent('purple')">
-                    <div class="theme-color color-purple"></div>
-                    <h3>Фіолетовий</h3>
-                </div>
-                <div class="theme-option ${currentAccent === 'pink' ? 'active' : ''}" onclick="ThemesPage.setAccent('pink')">
-                    <div class="theme-color color-pink"></div>
-                    <h3>Рожевий</h3>
+                <div class="theme-section">
+                    <h3 class="theme-section-title">
+                        <i class="fas fa-sun"></i> Світлий режим
+                    </h3>
+                    <div class="theme-grid">
+                        ${this.renderThemeOptions('light', currentTheme, currentAccent)}
+                    </div>
                 </div>
             </div>
         `;
@@ -1575,15 +1579,63 @@ const ThemesPage = {
         document.getElementById('themesPage').innerHTML = html;
     },
     
-    setTheme(theme) {
-        document.body.setAttribute('data-theme', theme);
-        localStorage.setItem('balancio-theme', theme);
-        this.render();
+    renderThemeOptions(mode, currentTheme, currentAccent) {
+        const accents = [
+            { id: 'blue', name: 'Синій', color: '#3b82f6' },
+            { id: 'green', name: 'Зелений', color: '#10b981' },
+            { id: 'purple', name: 'Фіолетовий', color: '#8b5cf6' },
+            { id: 'pink', name: 'Рожевий', color: '#ec4899' },
+            { id: 'orange', name: 'Помаранчевий', color: '#f97316' },
+            { id: 'teal', name: 'Бірюзовий', color: '#14b8a6' },
+            { id: 'red', name: 'Червоний', color: '#ef4444' },
+            { id: 'gray', name: 'Сірий', color: '#6b7280' },
+            { id: 'sky', name: 'Блакитний', color: '#0ea5e9' }
+        ];
+        
+        return accents.map(accent => {
+            const isActive = currentTheme === mode && currentAccent === accent.id;
+            const previewClass = `theme-preview theme-preview-${mode} theme-preview-${accent.id}`;
+            
+            return `
+                <div class="theme-card ${isActive ? 'active' : ''}" 
+                     onclick="ThemesPage.setTheme('${mode}', '${accent.id}')">
+                    <div class="${previewClass}">
+                        <div class="theme-preview-header" style="background: ${accent.color}"></div>
+                        <div class="theme-preview-content">
+                            <div class="theme-preview-line" style="background: ${accent.color}20"></div>
+                            <div class="theme-preview-line" style="background: ${accent.color}40"></div>
+                            <div class="theme-preview-line" style="background: ${accent.color}60"></div>
+                        </div>
+                    </div>
+                    <div class="theme-info">
+                        <span class="theme-name">${accent.name}</span>
+                        ${isActive ? '<i class="fas fa-check-circle theme-check"></i>' : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
     },
     
-    setAccent(color) {
-        document.body.setAttribute('data-accent', color);
-        localStorage.setItem('balancio-accent', color);
+    setTheme(mode, accent) {
+        document.body.setAttribute('data-theme', mode);
+        document.body.setAttribute('data-accent', accent);
+        localStorage.setItem('balancio-theme', mode);
+        localStorage.setItem('balancio-accent', accent);
+        
+        // Оновлюємо RGB змінні
+        const rgbValues = {
+            blue: '59, 130, 246',
+            green: '16, 185, 129',
+            purple: '139, 92, 246',
+            pink: '236, 72, 153',
+            orange: '249, 115, 22',
+            teal: '20, 184, 166',
+            red: '239, 68, 68',
+            gray: '107, 114, 128',
+            sky: '14, 165, 233'
+        };
+        document.documentElement.style.setProperty('--accent-primary-rgb', rgbValues[accent] || rgbValues.blue);
+        
         this.render();
     }
 };
