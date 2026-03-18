@@ -4,6 +4,12 @@
     box-sizing: border-box;
 }
 
+html, body {
+    width: 100%;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
 :root {
     /* Базові кольори (будуть перевизначені темами) */
     --bg-primary: #0a0c10;
@@ -38,8 +44,7 @@
     --transition: all 0.2s ease;
 }
 
-/* ===== ТЕМИ ===== */
-/* ТЕМНА ТЕМА - Синій неон */
+/* ===== ТЕМНІ ТЕМИ ===== */
 [data-theme="dark"][data-accent="blue"] {
     --bg-primary: #0a0c10;
     --bg-secondary: #111317;
@@ -51,7 +56,6 @@
     background: linear-gradient(145deg, #0a0c10 0%, #111317 100%);
 }
 
-/* ТЕМНА ТЕМА - Зелений ліс */
 [data-theme="dark"][data-accent="green"] {
     --bg-primary: #0c120e;
     --bg-secondary: #141e18;
@@ -63,7 +67,6 @@
     background: linear-gradient(145deg, #0c120e 0%, #141e18 100%);
 }
 
-/* ТЕМНА ТЕМА - Фіолетовий космос */
 [data-theme="dark"][data-accent="purple"] {
     --bg-primary: #0e0b14;
     --bg-secondary: #171129;
@@ -75,7 +78,6 @@
     background: linear-gradient(145deg, #0e0b14 0%, #171129 100%);
 }
 
-/* ТЕМНА ТЕМА - Рожевий захід */
 [data-theme="dark"][data-accent="pink"] {
     --bg-primary: #140e12;
     --bg-secondary: #22161d;
@@ -87,7 +89,6 @@
     background: linear-gradient(145deg, #140e12 0%, #22161d 100%);
 }
 
-/* ТЕМНА ТЕМА - Помаранчевий вогонь */
 [data-theme="dark"][data-accent="orange"] {
     --bg-primary: #141008;
     --bg-secondary: #2a1e0e;
@@ -99,7 +100,6 @@
     background: linear-gradient(145deg, #141008 0%, #2a1e0e 100%);
 }
 
-/* ТЕМНА ТЕМА - Бірюзовий океан */
 [data-theme="dark"][data-accent="teal"] {
     --bg-primary: #0a1214;
     --bg-secondary: #0e2026;
@@ -111,7 +111,6 @@
     background: linear-gradient(145deg, #0a1214 0%, #0e2026 100%);
 }
 
-/* ТЕМНА ТЕМА - Червона руда */
 [data-theme="dark"][data-accent="red"] {
     --bg-primary: #140a0a;
     --bg-secondary: #2a1010;
@@ -123,7 +122,6 @@
     background: linear-gradient(145deg, #140a0a 0%, #2a1010 100%);
 }
 
-/* ТЕМНА ТЕМА - Сірий мінімалізм */
 [data-theme="dark"][data-accent="gray"] {
     --bg-primary: #0f0f0f;
     --bg-secondary: #1a1a1a;
@@ -135,7 +133,6 @@
     background: linear-gradient(145deg, #0f0f0f 0%, #1a1a1a 100%);
 }
 
-/* ТЕМНА ТЕМА - Блакитне небо */
 [data-theme="dark"][data-accent="sky"] {
     --bg-primary: #0c121c;
     --bg-secondary: #142434;
@@ -145,51 +142,6 @@
     --accent-secondary: #2980b9;
     --border-accent: rgba(52, 152, 219, 0.3);
     background: linear-gradient(145deg, #0c121c 0%, #142434 100%);
-}
-
-/* СВІТЛА ТЕМА - Синій */
-[data-theme="light"][data-accent="blue"] {
-    --bg-primary: #f0f4f8;
-    --bg-secondary: #ffffff;
-    --bg-card: #f8fafc;
-    --bg-card-hover: #eef2f6;
-    --bg-input: #ffffff;
-    
-    --text-primary: #1a202c;
-    --text-secondary: #4a5568;
-    --text-tertiary: #718096;
-    
-    --accent-primary: #3182ce;
-    --accent-secondary: #38a169;
-    
-    --border-light: rgba(0, 0, 0, 0.05);
-    --border-medium: rgba(0, 0, 0, 0.1);
-    --border-accent: rgba(49, 130, 206, 0.3);
-    
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
-    --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.15);
-    background: linear-gradient(145deg, #f0f4f8 0%, #ffffff 100%);
-}
-
-/* СВІТЛА ТЕМА - Зелений */
-[data-theme="light"][data-accent="green"] {
-    --bg-primary: #f0f7f0;
-    --bg-secondary: #ffffff;
-    --bg-card: #f5faf5;
-    --bg-card-hover: #ebf5eb;
-    --accent-primary: #2f855a;
-    background: linear-gradient(145deg, #f0f7f0 0%, #ffffff 100%);
-}
-
-/* СВІТЛА ТЕМА - Фіолетовий */
-[data-theme="light"][data-accent="purple"] {
-    --bg-primary: #f5f0fa;
-    --bg-secondary: #ffffff;
-    --bg-card: #f8f5fc;
-    --bg-card-hover: #f0eaf8;
-    --accent-primary: #805ad5;
-    background: linear-gradient(145deg, #f5f0fa 0%, #ffffff 100%);
 }
 
 body {
@@ -247,15 +199,14 @@ body {
 
 /* ===== LANDING PAGE ===== */
 .landing-page {
-    min-height: 100vh;
     width: 100%;
+    min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     background: var(--bg-primary);
     padding: 20px;
     margin: 0;
-    overflow-y: auto;
 }
 
 .landing-content {
