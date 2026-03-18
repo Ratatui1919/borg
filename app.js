@@ -289,6 +289,14 @@ const FeaturesGrid = {
 
 // ========== INITIALIZATION ==========
 document.addEventListener('DOMContentLoaded', () => {
+    // Отримуємо DOM елементи
+    const landingPage = document.getElementById('landingPage');
+    const mainApp = document.getElementById('mainApp');
+    const landingLoginBtn = document.getElementById('landingLoginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const userEmailSpan = document.querySelector('#userEmail span');
+    const refreshIndicator = document.getElementById('refreshIndicator');
+    
     FeaturesGrid.render();
     Navigation.render();
     
@@ -298,34 +306,45 @@ document.addEventListener('DOMContentLoaded', () => {
     if (savedTheme) document.body.setAttribute('data-theme', savedTheme);
     if (savedAccent) document.body.setAttribute('data-accent', savedAccent);
     
-    // Auth listeners
-    landingLoginBtn.addEventListener('click', () => {
-        auth.signInWithPopup(new firebase.auth.GoogleAuthProvider())
-            .catch(e => alert('Помилка входу: ' + e.message));
-    });
+    // Функція для показу індикатора оновлення
+    window.showRefresh = () => {
+        if (refreshIndicator) {
+            refreshIndicator.classList.add('active');
+            setTimeout(() => refreshIndicator.classList.remove('active'), 1000);
+        }
+    };
     
-    logoutBtn.addEventListener('click', () => auth.signOut());
+    // Auth listeners
+    if (landingLoginBtn) {
+        landingLoginBtn.addEventListener('click', () => {
+            // Використовуємо redirect замість popup для уникнення Cross-Origin помилок
+            auth.signInWithRedirect(new firebase.auth.GoogleAuthProvider());
+        });
+    }
+    
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => auth.signOut());
+    }
+    
+    // Обробка редиректу
+    auth.getRedirectResult().catch(error => {
+        console.error('Redirect sign-in error:', error);
+    });
     
     auth.onAuthStateChanged(user => {
         if (user) {
             AppState.user = user;
-            userEmailSpan.textContent = user.email;
-            landingPage.style.display = 'none';
-            mainApp.style.display = 'block';
+            if (userEmailSpan) userEmailSpan.textContent = user.email;
+            if (landingPage) landingPage.style.display = 'none';
+            if (mainApp) mainApp.style.display = 'block';
             AppState.load(user.uid);
         } else {
             AppState.user = null;
-            landingPage.style.display = 'block';
-            mainApp.style.display = 'none';
+            if (landingPage) landingPage.style.display = 'block';
+            if (mainApp) mainApp.style.display = 'none';
         }
     });
 });
-
-// ========== GLOBAL HELPERS ==========
-const showRefresh = () => {
-    refreshIndicator.classList.add('active');
-    setTimeout(() => refreshIndicator.classList.remove('active'), 1000);
-};
 
 // Експортуємо все в глобальний об'єкт window
 window.Helpers = Helpers;
