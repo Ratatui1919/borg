@@ -1564,3 +1564,133 @@ body {
         font-size: 1.5rem;
     }
 }
+
+/* Додати в styles.css */
+
+/* ===== НОВИЙ ЛЕНДИНГ ===== */
+.landing-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 30%),
+                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 30%);
+}
+
+.landing-content {
+    max-width: 500px;
+    width: 100%;
+    padding: 40px 24px;
+    text-align: center;
+}
+
+.landing-logo {
+    font-size: 4rem;
+    color: var(--accent-primary);
+    margin-bottom: 20px;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+.landing-title {
+    font-size: 3rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 16px;
+    line-height: 1.2;
+}
+
+.landing-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin-bottom: 32px;
+}
+
+.landing-features {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 32px 0;
+}
+
+.landing-feature {
+    background: var(--bg-card);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-lg);
+    padding: 20px 16px;
+    transition: var(--transition);
+}
+
+.landing-feature:hover {
+    transform: translateY(-2px);
+    border-color: var(--accent-primary);
+}
+
+.landing-feature i {
+    font-size: 1.8rem;
+    color: var(--accent-primary);
+    margin-bottom: 12px;
+}
+
+.landing-feature span {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.landing-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-medium);
+    border-radius: var(--radius-xl);
+    padding: 32px;
+    margin-top: 32px;
+}
+
+.landing-stats {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 24px;
+}
+
+.landing-stat {
+    text-align: center;
+}
+
+.landing-stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent-primary);
+}
+
+.landing-stat-label {
+    font-size: 0.85rem;
+    color: var(--text-tertiary);
+}
+
+.landing-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, var(--accent-primary), #2563eb);
+    color: white;
+    border: none;
+    border-radius: var(--radius-full);
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+}
+
+.landing-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(59, 130, 246, 0.4);
+}
