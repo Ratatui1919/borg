@@ -735,19 +735,17 @@ const JournalPage = {
     }
 };
 
-// ========== BANK PAGE ==========
+// ========== BANK PAGE (З РЕДАГУВАННЯМ СУМ) ==========
 const BankPage = {
     render() {
         const accounts = AppState.data.bankAccounts || [];
         
-        // Групуємо рахунки за валютою
         const accountsByCurrency = {
             EUR: accounts.filter(acc => acc.currency === 'EUR'),
             UAH: accounts.filter(acc => acc.currency === 'UAH'),
             USD: accounts.filter(acc => acc.currency === 'USD')
         };
         
-        // Рахуємо підсумки по кожній валюті
         const totals = {
             EUR: accountsByCurrency.EUR.reduce((sum, acc) => sum + (acc.balance || 0), 0),
             UAH: accountsByCurrency.UAH.reduce((sum, acc) => sum + (acc.balance || 0), 0),
@@ -795,9 +793,14 @@ const BankPage = {
                                 <div class="bank-name">
                                     <i class="fas ${acc.icon || 'fa-building'}"></i> ${Helpers.escape(acc.name)}
                                 </div>
-                                <button class="btn-icon" onclick="BankPage.deleteAccount('${acc.id}')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
+                                <div style="display: flex; gap: 8px;">
+                                    <button class="btn-icon" onclick="BankPage.editBalance('${acc.id}')" title="Змінити суму">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </button>
+                                    <button class="btn-icon" onclick="BankPage.deleteAccount('${acc.id}')" title="Видалити">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
                             <div class="bank-balance">${(acc.balance || 0).toFixed(2)} ${symbol}</div>
                         </div>
@@ -805,6 +808,18 @@ const BankPage = {
                 </div>
             </div>
         `;
+    },
+    
+    editBalance(id) {
+        const account = AppState.data.bankAccounts.find(a => a.id === id);
+        if (!account) return;
+        
+        const newBalance = parseFloat(prompt(`Введіть нову суму для ${account.name}:`, account.balance));
+        if (isNaN(newBalance)) return;
+        
+        account.balance = newBalance;
+        AppState.save();
+        this.render();
     },
     
     deleteAccount(id) {
@@ -955,7 +970,7 @@ const RecurringPage = {
     }
 };
 
-// ========== ANALYTICS PAGE ==========
+// ========== ANALYTICS PAGE (ТІЛЬКИ ЄВРО) ==========
 const AnalyticsPage = {
     charts: {
         pie: null,
@@ -983,15 +998,15 @@ const AnalyticsPage = {
 
             <div class="analytics-summary">
                 <div class="stat-card">
-                    <div class="stat-title">💰 Дохід</div>
+                    <div class="stat-title">💰 Дохід (EUR)</div>
                     <div class="stat-value income" id="analyticsIncome">0 €</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-title">💸 Витрати</div>
+                    <div class="stat-title">💸 Витрати (EUR)</div>
                     <div class="stat-value expense" id="analyticsExpense">0 €</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-title">💎 Накопичено</div>
+                    <div class="stat-title">💎 Накопичено (EUR)</div>
                     <div class="stat-value" id="analyticsSaved">0 €</div>
                 </div>
             </div>
@@ -1042,11 +1057,8 @@ const AnalyticsPage = {
         const monthName = AppState.ui.currentMonth.toLocaleDateString('uk-UA', { month: 'long', year: 'numeric' });
         document.getElementById('analyticsMonth').textContent = monthName;
         
-        // Беремо транзакції з Щоденника
-        const transactions = [
-            ...(AppState.data.transactions.EUR || []).filter(t => t.month === monthKey),
-            ...(AppState.data.transactions.UAH || []).filter(t => t.month === monthKey)
-        ];
+        const transactions = (AppState.data.transactions.EUR || [])
+            .filter(t => t.month === monthKey);
         
         const income = transactions.filter(t => t.type === 'income')
             .reduce((sum, t) => sum + (t.amount || 0), 0);
@@ -1258,7 +1270,6 @@ const TipsPage = {
     ],
     
     render() {
-        // Перемішуємо поради при кожному завантаженні
         const shuffledTips = [...this.tips].sort(() => Math.random() - 0.5);
         
         const html = `
@@ -1322,7 +1333,6 @@ const ArchivePage = {
     },
     
     renderArchiveItems() {
-        // Беремо всі транзакції з Щоденника
         const allTransactions = [
             ...(AppState.data.transactions.EUR || []),
             ...(AppState.data.transactions.UAH || [])
@@ -1344,7 +1354,6 @@ const ArchivePage = {
             `;
         }
         
-        // Групуємо за місяцями
         const grouped = {};
         filtered.forEach(t => {
             if (!t.date) return;
@@ -1380,10 +1389,10 @@ const ArchivePage = {
     }
 };
 
-// ========== THEMES PAGE ==========
+// ========== THEMES PAGE (ТІЛЬКИ ТЕМНІ ТЕМИ) ==========
 const ThemesPage = {
     render() {
-        const currentTheme = document.body.getAttribute('data-theme') || 'dark';
+        const currentTheme = 'dark';
         const currentAccent = document.body.getAttribute('data-accent') || 'blue';
         
         const html = `
@@ -1396,19 +1405,10 @@ const ThemesPage = {
             <div class="themes-container">
                 <div class="theme-section">
                     <h3 class="theme-section-title">
-                        <i class="fas fa-moon"></i> Темний режим
+                        <i class="fas fa-moon"></i> Кольорові теми
                     </h3>
                     <div class="theme-grid">
-                        ${this.renderThemeOptions('dark', currentTheme, currentAccent)}
-                    </div>
-                </div>
-
-                <div class="theme-section">
-                    <h3 class="theme-section-title">
-                        <i class="fas fa-sun"></i> Світлий режим
-                    </h3>
-                    <div class="theme-grid">
-                        ${this.renderThemeOptions('light', currentTheme, currentAccent)}
+                        ${this.renderThemeOptions(currentAccent)}
                     </div>
                 </div>
             </div>
@@ -1417,7 +1417,7 @@ const ThemesPage = {
         document.getElementById('themesPage').innerHTML = html;
     },
     
-    renderThemeOptions(mode, currentTheme, currentAccent) {
+    renderThemeOptions(currentAccent) {
         const accents = [
             { id: 'blue', name: 'Синій неон', color: '#3b82f6' },
             { id: 'green', name: 'Зелений ліс', color: '#10b981' },
@@ -1431,24 +1431,17 @@ const ThemesPage = {
         ];
         
         return accents.map(accent => {
-            const isActive = currentTheme === mode && currentAccent === accent.id;
-            const previewClass = `theme-preview theme-preview-${mode}`;
-            
-            // Створюємо кольори для прев'ю на основі акценту
-            const headerStyle = `background: ${accent.color};`;
-            const line1Style = `background: ${accent.color}20;`;
-            const line2Style = `background: ${accent.color}40;`;
-            const line3Style = `background: ${accent.color}60;`;
+            const isActive = currentAccent === accent.id;
             
             return `
                 <div class="theme-card ${isActive ? 'active' : ''}" 
-                     onclick="ThemesPage.setTheme('${mode}', '${accent.id}')">
-                    <div class="${previewClass}">
-                        <div class="theme-preview-header" style="${headerStyle}"></div>
+                     onclick="ThemesPage.setAccent('${accent.id}')">
+                    <div class="theme-preview theme-preview-dark">
+                        <div class="theme-preview-header" style="background: ${accent.color};"></div>
                         <div class="theme-preview-content">
-                            <div class="theme-preview-line" style="${line1Style}"></div>
-                            <div class="theme-preview-line" style="${line2Style}"></div>
-                            <div class="theme-preview-line" style="${line3Style}"></div>
+                            <div class="theme-preview-line" style="background: ${accent.color}20;"></div>
+                            <div class="theme-preview-line" style="background: ${accent.color}40;"></div>
+                            <div class="theme-preview-line" style="background: ${accent.color}60;"></div>
                         </div>
                     </div>
                     <div class="theme-info">
@@ -1460,13 +1453,10 @@ const ThemesPage = {
         }).join('');
     },
     
-    setTheme(mode, accent) {
-        document.body.setAttribute('data-theme', mode);
+    setAccent(accent) {
         document.body.setAttribute('data-accent', accent);
-        localStorage.setItem('balancio-theme', mode);
         localStorage.setItem('balancio-accent', accent);
         
-        // Оновлюємо RGB змінні
         const rgbValues = {
             blue: '59, 130, 246',
             green: '16, 185, 129',
