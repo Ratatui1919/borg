@@ -5,7 +5,6 @@ const Navigation = {
         { id: 'goals', icon: 'fa-bullseye', label: 'Цілі' },
         { id: 'journal', icon: 'fa-book-open', label: 'Щоденник' },
         { id: 'bank', icon: 'fa-wallet', label: 'Мій банк' },
-        { id: 'budget', icon: 'fa-chart-pie', label: 'Бюджет' },
         { id: 'recurring', icon: 'fa-clock', label: 'Регулярні' },
         { id: 'analytics', icon: 'fa-chart-line', label: 'Аналітика' },
         { id: 'tips', icon: 'fa-lightbulb', label: 'Поради' },
@@ -50,7 +49,6 @@ const Navigation = {
             case 'goals': GoalsPage.render(); break;
             case 'journal': JournalPage.render(); break;
             case 'bank': BankPage.render(); break;
-            case 'budget': BudgetPage.render(); break;
             case 'recurring': RecurringPage.render(); break;
             case 'analytics': AnalyticsPage.render(); break;
             case 'tips': TipsPage.render(); break;
@@ -741,66 +739,72 @@ const JournalPage = {
 const BankPage = {
     render() {
         const accounts = AppState.data.bankAccounts || [];
-        const total = accounts.reduce((sum, acc) => sum + (acc.balance || 0), 0);
+        
+        // Групуємо рахунки за валютою
+        const accountsByCurrency = {
+            EUR: accounts.filter(acc => acc.currency === 'EUR'),
+            UAH: accounts.filter(acc => acc.currency === 'UAH'),
+            USD: accounts.filter(acc => acc.currency === 'USD')
+        };
+        
+        // Рахуємо підсумки по кожній валюті
+        const totals = {
+            EUR: accountsByCurrency.EUR.reduce((sum, acc) => sum + (acc.balance || 0), 0),
+            UAH: accountsByCurrency.UAH.reduce((sum, acc) => sum + (acc.balance || 0), 0),
+            USD: accountsByCurrency.USD.reduce((sum, acc) => sum + (acc.balance || 0), 0)
+        };
         
         const html = `
             <div class="page-header">
                 <h2 class="page-title">
                     <i class="fas fa-wallet"></i> Мій банк
                 </h2>
-            </div>
-
-            <div class="total-balance">
-                <div class="total-balance-label">Загальний капітал</div>
-                <div class="total-balance-value">${total.toFixed(2)} €</div>
-            </div>
-
-            <div class="page-header" style="margin-top: 20px;">
-                <h3 class="page-title" style="font-size: 1.2rem;">
-                    <i class="fas fa-wallet"></i> Мої рахунки
-                </h3>
                 <button class="btn btn-primary" onclick="Modals.openBankModal()">
                     <i class="fas fa-plus"></i> Додати рахунок
                 </button>
             </div>
 
-            <div class="bank-grid">
-                ${this.renderAccounts(accounts)}
+            <div class="bank-total">
+                <div class="bank-total-label">💶 Євро</div>
+                <div class="bank-total-value">${totals.EUR.toFixed(2)} €</div>
+                <div style="margin-top: 10px; opacity:0.8;">💴 Гривня: ${totals.UAH.toFixed(2)} ₴</div>
+                <div style="opacity:0.8;">💵 Долар: ${totals.USD.toFixed(2)} $</div>
             </div>
+
+            ${this.renderCurrencySection('Євро', '€', accountsByCurrency.EUR)}
+            ${this.renderCurrencySection('Гривня', '₴', accountsByCurrency.UAH)}
+            ${this.renderCurrencySection('Долар', '$', accountsByCurrency.USD)}
         `;
         
         document.getElementById('bankPage').innerHTML = html;
     },
     
-    renderAccounts(accounts) {
-        if (!accounts.length) {
-            return `
-                <div class="empty-state">
-                    <i class="fas fa-wallet"></i>
-                    <p>У вас ще немає рахунків</p>
-                    <button class="btn btn-primary" onclick="Modals.openBankModal()">
-                        <i class="fas fa-plus"></i> Додати рахунок
-                    </button>
-                </div>
-            `;
-        }
+    renderCurrencySection(title, symbol, accounts) {
+        if (!accounts.length) return '';
         
-        return accounts.map(acc => `
-            <div class="bank-card">
-                <div class="bank-header">
-                    <div class="bank-name">
-                        <i class="fas ${acc.icon || 'fa-building'}"></i> ${Helpers.escape(acc.name)}
-                    </div>
-                    <button class="btn-icon" onclick="BankPage.deleteAccount('${acc.id}')">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                </div>
-                <div class="bank-balance">${(acc.balance || 0).toFixed(2)} ${Helpers.getSymbol(acc.currency)}</div>
-                <div class="bank-details">
-                    <span><i class="fas fa-credit-card"></i> ${acc.currency}</span>
+        return `
+            <div class="bank-currency-section">
+                <h3 class="bank-currency-title">
+                    <i class="fas ${title === 'Євро' ? 'fa-euro-sign' : title === 'Гривня' ? 'fa-hryvnia' : 'fa-dollar-sign'}"></i>
+                    ${title}
+                </h3>
+                <div class="bank-grid">
+                    ${accounts.map(acc => `
+                        <div class="bank-card">
+                            <div class="bank-header">
+                                <div class="bank-name">
+                                    <i class="fas ${acc.icon || 'fa-building'}"></i> ${Helpers.escape(acc.name)}
+                                </div>
+                                <button class="btn-icon" onclick="BankPage.deleteAccount('${acc.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                            <div class="bank-balance">${(acc.balance || 0).toFixed(2)} ${symbol}</div>
+                        </div>
+                    `).join('')}
                 </div>
             </div>
-        `).join('');
+        `;
     },
     
     deleteAccount(id) {
@@ -814,185 +818,6 @@ const BankPage = {
     getRandomIcon() {
         const icons = ['fa-building', 'fa-credit-card', 'fa-wallet', 'fa-piggy-bank', 'fa-coins'];
         return icons[Math.floor(Math.random() * icons.length)];
-    }
-};
-
-// ========== BUDGET PAGE ==========
-const BudgetPage = {
-    render() {
-        const monthKey = Helpers.getMonthKey(AppState.ui.currentMonth);
-        const monthName = AppState.ui.currentMonth.toLocaleDateString('uk-UA', { month: 'long', year: 'numeric' });
-        const budgetData = AppState.data.budgets[monthKey] || this.getDefaultBudget();
-        
-        this.updateSpent(monthKey);
-        
-        const html = `
-            <div class="page-header">
-                <h2 class="page-title">
-                    <i class="fas fa-chart-pie"></i> Бюджет
-                </h2>
-                <button class="btn btn-primary" onclick="BudgetPage.editBudget()">
-                    <i class="fas fa-edit"></i> Редагувати
-                </button>
-            </div>
-
-            <div class="budget-summary">
-                <div class="stat-card">
-                    <div class="stat-title">💰 Загальний бюджет</div>
-                    <div class="stat-value">${this.calcTotalBudget(budgetData)} €</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-title">💸 Витрачено</div>
-                    <div class="stat-value expense">${this.calcTotalSpent(budgetData)} €</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-title">💎 Залишилось</div>
-                    <div class="stat-value ${this.calcRemaining(budgetData) >= 0 ? 'income' : 'expense'}">
-                        ${this.calcRemaining(budgetData)} €
-                    </div>
-                </div>
-            </div>
-
-            <h3 class="page-title" style="font-size: 1.2rem; margin: 20px 0;">
-                <i class="fas fa-chart-line"></i> Бюджет на ${monthName}
-            </h3>
-
-            <div class="budget-grid">
-                ${this.renderBudgetItems(budgetData)}
-            </div>
-        `;
-        
-        document.getElementById('budgetPage').innerHTML = html;
-    },
-    
-    getDefaultBudget() {
-        return {
-            food: { name: 'Їжа', planned: 400, spent: 0, icon: 'fa-utensils' },
-            transport: { name: 'Транспорт', planned: 100, spent: 0, icon: 'fa-bus' },
-            entertainment: { name: 'Розваги', planned: 150, spent: 0, icon: 'fa-film' },
-            health: { name: 'Здоров\'я', planned: 100, spent: 0, icon: 'fa-heartbeat' },
-            shopping: { name: 'Покупки', planned: 200, spent: 0, icon: 'fa-bag-shopping' },
-            other: { name: 'Інше', planned: 150, spent: 0, icon: 'fa-ellipsis' }
-        };
-    },
-    
-    calcTotalBudget(budget) {
-        return Object.values(budget).reduce((sum, cat) => sum + (cat.planned || 0), 0).toFixed(2);
-    },
-    
-    calcTotalSpent(budget) {
-        return Object.values(budget).reduce((sum, cat) => sum + (cat.spent || 0), 0).toFixed(2);
-    },
-    
-    calcRemaining(budget) {
-        const total = parseFloat(this.calcTotalBudget(budget));
-        const spent = parseFloat(this.calcTotalSpent(budget));
-        return (total - spent).toFixed(2);
-    },
-    
-    renderBudgetItems(budget) {
-        return Object.entries(budget).map(([key, cat]) => {
-            const percent = cat.planned > 0 ? ((cat.spent || 0) / cat.planned) * 100 : 0;
-            const status = percent > 100 ? 'budget-danger' : percent > 80 ? 'budget-warning' : '';
-            
-            return `
-                <div class="budget-card">
-                    <div class="budget-header">
-                        <div class="budget-category">
-                            <i class="fas ${cat.icon}"></i> ${cat.name}
-                        </div>
-                        <span class="${status}">${percent.toFixed(0)}%</span>
-                    </div>
-                    <div class="budget-numbers">
-                        <span>Витрачено: ${(cat.spent || 0).toFixed(2)} €</span>
-                        <span>План: ${(cat.planned || 0).toFixed(2)} €</span>
-                    </div>
-                    <div class="budget-progress-bar">
-                        <div class="budget-progress-fill ${status}" style="width: ${Math.min(percent, 100)}%"></div>
-                    </div>
-                    ${percent > 100 ? 
-                        `<div class="budget-warning">Перевищення на ${(percent - 100).toFixed(0)}%</div>` : 
-                        `<div class="budget-remaining">Залишилось ${((cat.planned || 0) - (cat.spent || 0)).toFixed(2)} €</div>`
-                    }
-                </div>
-            `;
-        }).join('');
-    },
-    
-    editBudget() {
-        const monthKey = Helpers.getMonthKey(AppState.ui.currentMonth);
-        const budgetData = AppState.data.budgets[monthKey] || this.getDefaultBudget();
-        
-        let formHtml = '<div class="budget-edit-form">';
-        Object.entries(budgetData).forEach(([key, cat]) => {
-            formHtml += `
-                <div class="budget-edit-item">
-                    <label><i class="fas ${cat.icon}"></i> ${cat.name}</label>
-                    <input type="number" class="budget-edit-input" id="budget-${key}" 
-                           value="${cat.planned || 0}" step="10" min="0">
-                </div>
-            `;
-        });
-        formHtml += '</div>';
-        
-        const modal = document.getElementById('budgetModal');
-        modal.innerHTML = `
-            <div class="modal-content">
-                <h2><i class="fas fa-chart-pie"></i> Редагувати бюджет</h2>
-                ${formHtml}
-                <div class="modal-buttons">
-                    <button class="modal-btn create" onclick="BudgetPage.saveBudget()">Зберегти</button>
-                    <button class="modal-btn cancel" onclick="Modals.closeModal('budgetModal')">Скасувати</button>
-                </div>
-            </div>
-        `;
-        modal.classList.add('active');
-    },
-    
-    saveBudget() {
-        const monthKey = Helpers.getMonthKey(AppState.ui.currentMonth);
-        const defaultBudget = this.getDefaultBudget();
-        const newBudget = {};
-        
-        Object.keys(defaultBudget).forEach(key => {
-            const input = document.getElementById(`budget-${key}`);
-            if (input) {
-                newBudget[key] = {
-                    ...defaultBudget[key],
-                    planned: parseFloat(input.value) || 0,
-                    spent: AppState.data.budgets[monthKey]?.[key]?.spent || 0
-                };
-            }
-        });
-        
-        if (!AppState.data.budgets) AppState.data.budgets = {};
-        AppState.data.budgets[monthKey] = newBudget;
-        AppState.save();
-        
-        Modals.closeModal('budgetModal');
-        this.render();
-    },
-    
-    updateSpent(monthKey) {
-        const transactions = [
-            ...(AppState.data.transactions.EUR || []),
-            ...(AppState.data.transactions.UAH || [])
-        ].filter(t => t.month === monthKey && t.type === 'expense');
-        
-        if (!AppState.data.budgets[monthKey]) {
-            AppState.data.budgets[monthKey] = this.getDefaultBudget();
-        }
-        
-        Object.keys(AppState.data.budgets[monthKey]).forEach(key => {
-            AppState.data.budgets[monthKey][key].spent = 0;
-        });
-        
-        transactions.forEach(t => {
-            const cat = t.category;
-            if (AppState.data.budgets[monthKey][cat]) {
-                AppState.data.budgets[monthKey][cat].spent += t.amount || 0;
-            }
-        });
     }
 };
 
@@ -1217,6 +1042,7 @@ const AnalyticsPage = {
         const monthName = AppState.ui.currentMonth.toLocaleDateString('uk-UA', { month: 'long', year: 'numeric' });
         document.getElementById('analyticsMonth').textContent = monthName;
         
+        // Беремо транзакції з Щоденника
         const transactions = [
             ...(AppState.data.transactions.EUR || []).filter(t => t.month === monthKey),
             ...(AppState.data.transactions.UAH || []).filter(t => t.month === monthKey)
@@ -1394,32 +1220,47 @@ const AnalyticsPage = {
 const TipsPage = {
     tips: [
         {
-            title: 'Правило 50/30/20',
-            text: '50% доходу на потреби, 30% на бажання, 20% на заощадження.'
+            title: '💰 Правило 50/30/20',
+            text: '50% доходу на потреби, 30% на бажання, 20% на заощадження. Це золоте правило фінансової грамотності!'
         },
         {
-            title: 'Економія на підписках',
-            text: 'Перевірте регулярні платежі - можливо, ви платите за сервіси, якими не користуєтесь.'
+            title: '📱 Економія на підписках',
+            text: 'Перевірте регулярні платежі - можливо, ви платите за сервіси, якими не користуєтесь. Середня людина має 3-4 непотрібні підписки!'
         },
         {
-            title: 'Фінансова подушка',
-            text: 'Рекомендується мати запас 3-6 місячних витрат.'
+            title: '🛡️ Фінансова подушка',
+            text: 'Рекомендується мати запас 3-6 місячних витрат. Почніть з маленької суми і поступово збільшуйте!'
         },
         {
-            title: 'Інвестиції для початківців',
-            text: 'Почніть з малого - регулярно інвестуйте невеликі суми.'
+            title: '📈 Інвестиції для початківців',
+            text: 'Почніть з малого - регулярно інвестуйте навіть 10-20% доходу. Головне - систематичність!'
         },
         {
-            title: 'Кешбек та бонуси',
-            text: 'Використовуйте картки з кешбеком для повсякденних витрат.'
+            title: '💳 Кешбек та бонуси',
+            text: 'Використовуйте картки з кешбеком для повсякденних витрат. За рік може набігти приємна сума!'
         },
         {
-            title: 'Автоматизація заощаджень',
-            text: 'Налаштуйте автоматичне перерахування % від доходу на заощадження.'
+            title: '🤖 Автоматизація заощаджень',
+            text: 'Налаштуйте автоматичне перерахування % від доходу на заощадження - так ви не будете спокушатися витратити ці гроші.'
+        },
+        {
+            title: '🎯 Цілі мають бути SMART',
+            text: 'Specific, Measurable, Achievable, Relevant, Time-bound. Конкретна ціль працює краще за абстрактне "хочу заощадити"'
+        },
+        {
+            title: '📊 Ведіть бюджет',
+            text: 'Тільки 30% людей ведуть бюджет, але саме вони досягають фінансових цілей у 2 рази частіше!'
+        },
+        {
+            title: '🏦 Банківські відсотки',
+            text: 'Тримайте гроші на депозитах чи накопичувальних рахунках. Інфляція з'їдає готівку під матрацом!'
         }
     ],
     
     render() {
+        // Перемішуємо поради при кожному завантаженні
+        const shuffledTips = [...this.tips].sort(() => Math.random() - 0.5);
+        
         const html = `
             <div class="page-header">
                 <h2 class="page-title">
@@ -1431,24 +1272,19 @@ const TipsPage = {
             </div>
 
             <div class="tips-grid">
-                ${this.renderTips()}
+                ${shuffledTips.map(tip => `
+                    <div class="tip-card">
+                        <div class="tip-title">${tip.title}</div>
+                        <div class="tip-text">${tip.text}</div>
+                    </div>
+                `).join('')}
             </div>
         `;
         
         document.getElementById('tipsPage').innerHTML = html;
     },
     
-    renderTips() {
-        return this.tips.map(tip => `
-            <div class="tip-card">
-                <div class="tip-title">${tip.title}</div>
-                <div class="tip-text">${tip.text}</div>
-            </div>
-        `).join('');
-    },
-    
     refresh() {
-        this.tips = [...this.tips].sort(() => Math.random() - 0.5);
         this.render();
     }
 };
@@ -1486,6 +1322,7 @@ const ArchivePage = {
     },
     
     renderArchiveItems() {
+        // Беремо всі транзакції з Щоденника
         const allTransactions = [
             ...(AppState.data.transactions.EUR || []),
             ...(AppState.data.transactions.UAH || [])
@@ -1507,6 +1344,7 @@ const ArchivePage = {
             `;
         }
         
+        // Групуємо за місяцями
         const grouped = {};
         filtered.forEach(t => {
             if (!t.date) return;
@@ -1581,30 +1419,36 @@ const ThemesPage = {
     
     renderThemeOptions(mode, currentTheme, currentAccent) {
         const accents = [
-            { id: 'blue', name: 'Синій', color: '#3b82f6' },
-            { id: 'green', name: 'Зелений', color: '#10b981' },
-            { id: 'purple', name: 'Фіолетовий', color: '#8b5cf6' },
-            { id: 'pink', name: 'Рожевий', color: '#ec4899' },
-            { id: 'orange', name: 'Помаранчевий', color: '#f97316' },
-            { id: 'teal', name: 'Бірюзовий', color: '#14b8a6' },
-            { id: 'red', name: 'Червоний', color: '#ef4444' },
-            { id: 'gray', name: 'Сірий', color: '#6b7280' },
-            { id: 'sky', name: 'Блакитний', color: '#0ea5e9' }
+            { id: 'blue', name: 'Синій неон', color: '#3b82f6' },
+            { id: 'green', name: 'Зелений ліс', color: '#10b981' },
+            { id: 'purple', name: 'Фіолетовий космос', color: '#8b5cf6' },
+            { id: 'pink', name: 'Рожевий захід', color: '#ec4899' },
+            { id: 'orange', name: 'Помаранчевий вогонь', color: '#f97316' },
+            { id: 'teal', name: 'Бірюзовий океан', color: '#14b8a6' },
+            { id: 'red', name: 'Червона руда', color: '#ef4444' },
+            { id: 'gray', name: 'Сірий мінімалізм', color: '#6b7280' },
+            { id: 'sky', name: 'Блакитне небо', color: '#0ea5e9' }
         ];
         
         return accents.map(accent => {
             const isActive = currentTheme === mode && currentAccent === accent.id;
-            const previewClass = `theme-preview theme-preview-${mode} theme-preview-${accent.id}`;
+            const previewClass = `theme-preview theme-preview-${mode}`;
+            
+            // Створюємо кольори для прев'ю на основі акценту
+            const headerStyle = `background: ${accent.color};`;
+            const line1Style = `background: ${accent.color}20;`;
+            const line2Style = `background: ${accent.color}40;`;
+            const line3Style = `background: ${accent.color}60;`;
             
             return `
                 <div class="theme-card ${isActive ? 'active' : ''}" 
                      onclick="ThemesPage.setTheme('${mode}', '${accent.id}')">
                     <div class="${previewClass}">
-                        <div class="theme-preview-header" style="background: ${accent.color}"></div>
+                        <div class="theme-preview-header" style="${headerStyle}"></div>
                         <div class="theme-preview-content">
-                            <div class="theme-preview-line" style="background: ${accent.color}20"></div>
-                            <div class="theme-preview-line" style="background: ${accent.color}40"></div>
-                            <div class="theme-preview-line" style="background: ${accent.color}60"></div>
+                            <div class="theme-preview-line" style="${line1Style}"></div>
+                            <div class="theme-preview-line" style="${line2Style}"></div>
+                            <div class="theme-preview-line" style="${line3Style}"></div>
                         </div>
                     </div>
                     <div class="theme-info">
