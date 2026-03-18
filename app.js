@@ -19,6 +19,34 @@ document.addEventListener('DOMContentLoaded', () => {
     if (savedTheme) document.body.setAttribute('data-theme', savedTheme);
     if (savedAccent) document.body.setAttribute('data-accent', savedAccent);
     
+    // Оновлюємо RGB змінні
+    const updateAccentRGB = () => {
+        const accent = document.body.getAttribute('data-accent') || 'blue';
+        const rgbValues = {
+            blue: '59, 130, 246',
+            green: '16, 185, 129',
+            purple: '139, 92, 246',
+            pink: '236, 72, 153',
+            orange: '249, 115, 22',
+            teal: '20, 184, 166',
+            red: '239, 68, 68',
+            gray: '107, 114, 128',
+            sky: '14, 165, 233'
+        };
+        document.documentElement.style.setProperty('--accent-primary-rgb', rgbValues[accent] || rgbValues.blue);
+    };
+    updateAccentRGB();
+    
+    // Спостерігач за зміною теми
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.attributeName === 'data-accent') {
+                updateAccentRGB();
+            }
+        });
+    });
+    observer.observe(document.body, { attributes: true });
+    
     // Функція для показу індикатора оновлення
     window.showRefresh = () => {
         if (refreshIndicator) {
